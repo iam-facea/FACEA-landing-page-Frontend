@@ -1,0 +1,50 @@
+.home-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(#a7b8db);
+}
+
+.home-card {
+  width: min(100%, 540px);
+  display: grid;
+  justify-items: center;
+  gap: 20px;
+  padding: 40px 24px;
+  text-align: center;
+  color: #f8fafc;
+}
+
+.home-card h1 {
+  margin: 0;
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  letter-spacing: 0.12em;
+}
+
+.home-card p {
+  margin: 0;
+  max-width: 38ch;
+  color: rgba(248, 250, 252, 0.82);
+}
+
+.home-card button {
+  border: 0;
+  border-radius: 999px;
+  padding: 14px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #9bb8fc;
+  background: #f8fafc;
+  cursor: pointer;
+}
+
+.home-card button:hover {
+  opacity: 0.92;
+}
+
+.home-card button:focus-visible {
+  outline: 3px solid rgba(248, 250, 252, 0.7);
+  outline-offset: 3px;
+}
