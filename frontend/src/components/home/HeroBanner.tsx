@@ -1,4 +1,4 @@
-import faceaLogo from "../../assets/FACEA-logo.png";
+import faceaLogo from "../../assets/images/FACEA-logo.png";
 import { Button } from "../ui/Button.tsx";
 export const HeroBanner = () => {
   return (
