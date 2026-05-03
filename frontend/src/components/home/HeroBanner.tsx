@@ -1,3 +1,4 @@
+import { Button } from "../ui/Button.tsx";
 export const HeroBanner = () => {
   return (
     // Tailwind CSS: section spacing, responsive typography and button states.
@@ -24,18 +25,12 @@ export const HeroBanner = () => {
         </p>
 
         <div className="flex flex-col gap-4 md:flex-row">
-          <button
-            className="rounded-xl bg-[#10183e] px-8 py-4 font-semibold text-white shadow-lg transition-transform duration-300 hover:scale-[1.03]"
-            type="button"
-          >
+          <Button variant="primary" size="lg">
             Involúcrate
-          </button>
-          <button
-            className="rounded-xl bg-[#e8e8ea] px-8 py-4 font-semibold text-[#0d153b] transition-all duration-300 hover:scale-[1.03] hover:bg-[#e2e2e4]"
-            type="button"
-          >
+          </Button>
+          <Button variant="secondary" size="lg">
             Conoce más
-          </button>
+          </Button>
         </div>
       </div>
     </section>
