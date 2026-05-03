@@ -1,61 +1,54 @@
 import React from "react";
 
-type Variant = "primary" | "secondary" | "outline" | "ghost";
-type Size = "sm" | "md" | "lg";
-
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: Variant;
-  size?: Size;
-  className?: string;
+// Tipamos nuestro componente extendiendo los atributos nativos de HTML
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: "primary" | "secondary";
+  size?: "sm" | "md" | "lg";
+  fullWidth?: boolean;
+  children: React.ReactNode;
 }
 
-const variantMap: Record<Variant, string> = {
-  primary:
-    "rounded-xl bg-[#10183e] px-8 py-4 font-semibold text-white shadow-lg transition-transform duration-300 hover:scale-[1.03]",
-  secondary:
-    "rounded-xl bg-[#e8e8ea] px-8 py-4 font-semibold text-[#0d153b] transition-all duration-300 hover:scale-[1.03] hover:bg-[#e2e2e4]",
-  outline:
-    "bg-transparent text-blue-600 border-blue-600 hover:bg-blue-600 hover:text-white focus:ring-blue-300",
-  ghost:
-    "bg-transparent text-gray-800 border-transparent hover:bg-gray-50 focus:ring-gray-300",
-};
-
-const sizeMap: Record<Size, string> = {
-  sm: "px-3 py-1.5 text-sm",
-  md: "px-4 py-2 text-base",
-  lg: "px-5 py-3 text-lg",
-};
-
-const baseClasses =
-  "inline-flex items-center justify-center font-medium rounded-md border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2";
-
-export const Button: React.FC<ButtonProps> = ({
-  children,
+export const Button = ({
   variant = "primary",
   size = "md",
+  fullWidth = false,
+  children,
   className = "",
   disabled,
-  ...rest
-}) => {
-  const variantClasses = variantMap[variant];
-  const sizeClasses = sizeMap[size];
-  const disabledClasses = disabled ? "opacity-50 cursor-not-allowed" : "";
+  ...props
+}: ButtonProps) => {
+  // 1. ESTILOS BASE: Lo que comparten TODOS los botones (borde, fuente, animación)
+  // Agregué 'active:scale-[0.98]' para que haga un pequeño hundimiento al hacer clic real
+  // 'inline-flex items-center justify-center' asegura que el texto (y futuros íconos) queden centrados
+  const baseStyles =
+    "inline-flex items-center justify-center rounded-xl font-semibold transition-all duration-300 ease-in-out hover:scale-[1.03] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none disabled:hover:scale-100";
 
-  const classes = [
-    baseClasses,
-    variantClasses,
-    sizeClasses,
-    disabledClasses,
-    className,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  // 2. VARIANTES DE COLOR: Tus diseños exactos
+  const variants = {
+    primary: "bg-[#10183e] text-white shadow-lg",
+    // Le agregué un leve borde sutil al secundario que suele ayudar en fondos blancos
+    secondary:
+      "bg-[#e8e8ea] text-[#0d153b] hover:bg-[#e2e2e4] border border-transparent hover:border-[#d1d1d4]",
+  };
+
+  // 3. TAMAÑOS: Para poder reusarlo en distintas partes de la web
+  const sizes = {
+    sm: "px-4 py-2 text-sm", // Ideal para formularios o tarjetas pequeñas
+    md: "px-6 py-3 text-base", // El tamaño estándar por defecto
+    lg: "px-8 py-4 text-lg", // <-- Este es TU tamaño original, ideal para el HeroBanner
+  };
+
+  // 4. ANCHO COMPLETO: Utilidad rápida para vistas móviles
+  const widthClass = fullWidth ? "w-full" : "";
 
   return (
-    <button className={classes} disabled={disabled} {...rest}>
+    <button
+      // Juntamos todas las piezas dinámicamente y permitimos inyectar clases extra con 'className'
+      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${widthClass} ${className}`}
+      disabled={disabled}
+      {...props}
+    >
       {children}
     </button>
   );
 };
-
-export default Button;
