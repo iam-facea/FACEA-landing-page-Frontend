@@ -1,3 +1,4 @@
+import faceaLogo from "../../assets/FACEA-logo.png";
 import { Button } from "../ui/Button.tsx";
 export const HeroBanner = () => {
   return (
@@ -12,7 +13,7 @@ export const HeroBanner = () => {
           <img
             alt="IAM FACEA Official Brandmark"
             className="h-full w-full scale-150 object-contain"
-            /*src={faceaLogo}*/
+            src={faceaLogo}
           />
         </div>
 
