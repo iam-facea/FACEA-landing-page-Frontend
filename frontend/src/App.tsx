@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import Home from "./pages/Home";
 import { Navbar } from "./components/layout/NavBar";
+import { AboutUs } from "./components/home/AboutUs";
 
 function App() {
   //const [count, setCount] = useState(0)
@@ -117,6 +118,7 @@ function App() {
     <>
       <Navbar />
       <Home />
+      <AboutUs />
     </>
   );
 }
