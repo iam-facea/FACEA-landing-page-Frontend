@@ -2,10 +2,10 @@ import { Card } from "../ui/Card";
 import { Container } from "../ui/Container";
 
 // Importa aquí tus imágenes (asegúrate de que las rutas sean correctas)
-//import gruposMisioneros from "../../assets/images/Grupos misioneros.jpg";
-//import comisionFaros from "../../assets/images/comisionFaros.jpg"; // Ajusta el nombre
-//import grupoOracion from "../../assets/images/grupoOracion.jpg"; // Ajusta el nombre
-//import musicaImage from "../../assets/images/musicaImage.jpg"; // Ajusta el nombre
+import gruposMisioneros from "../../assets/images/Grupos misioneros.jpg";
+import comisionFaros from "../../assets/images/comisionFaros.jpg"; // Ajusta el nombre
+import grupoOracion from "../../assets/images/grupoOracion.jpg"; // Ajusta el nombre
+import musicaImage from "../../assets/images/musicaImage.jpg"; // Ajusta el nombre
 
 const valores = [
   {
