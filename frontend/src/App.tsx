@@ -117,7 +117,6 @@ function App() {
       <section id="spacer"></section>
     </>*/
     <>
-      <h1 className="text-4xl font-bold text-blue-600">¡Tailwind funciona!</h1>
       <Home />
     </>
   );
