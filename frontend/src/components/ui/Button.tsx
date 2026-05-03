@@ -11,13 +11,13 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const variantMap: Record<Variant, string> = {
   primary:
-    "bg-blue-600 text-white border-transparent hover:bg-blue-700 focus:ring-blue-500",
+    "rounded-xl bg-[#10183e] px-8 py-4 font-semibold text-white shadow-lg transition-transform duration-300 hover:scale-[1.03]",
   secondary:
-    "bg-white text-gray-800 border-gray-300 hover:bg-gray-50 focus:ring-gray-300",
+    "rounded-xl bg-[#e8e8ea] px-8 py-4 font-semibold text-[#0d153b] transition-all duration-300 hover:scale-[1.03] hover:bg-[#e2e2e4]",
   outline:
-    "bg-transparent text-blue-600 border-blue-600 hover:bg-blue-50 focus:ring-blue-300",
+    "bg-transparent text-blue-600 border-blue-600 hover:bg-blue-600 hover:text-white focus:ring-blue-300",
   ghost:
-    "bg-transparent text-gray-700 border-transparent hover:bg-gray-100 focus:ring-blue-300",
+    "bg-transparent text-gray-800 border-transparent hover:bg-gray-50 focus:ring-gray-300",
 };
 
 const sizeMap: Record<Size, string> = {
