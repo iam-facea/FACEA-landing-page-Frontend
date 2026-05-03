@@ -1,26 +1,40 @@
 export const HeroBanner = () => {
   return (
-    <section className="relative bg-amber-50 text-black overflow-hidden">
-      {/* Contenedor principal con padding y centrado */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 flex flex-col items-center text-center">
-        {/* Etiqueta superior */}
-        <span className="inline-block py-1 px-3 text-black text-5xl font-bold tracking-wider mb-6">
-          ESCUELA SABÁTICA FACEA
-        </span>
+    // Tailwind CSS: section spacing, responsive typography and button states.
+    <section
+      id="inicio"
+      className="reveal active relative overflow-hidden px-8 pb-20 pt-32 md:pb-32 md:pt-48"
+    >
+      <div className="mx-auto flex max-w-7xl flex-col items-center text-center">
+        {/* Vite asset import + React JSX interpolation in src={...}. */}
+        <div className="mb-12 flex h-24 w-24 items-center justify-center md:h-32 md:w-32">
+          <img
+            alt="IAM FACEA Official Brandmark"
+            className="h-full w-full scale-150 object-contain"
+            /*src={faceaLogo}*/
+          />
+        </div>
 
-        {/* Título principal */}
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6">
-          Fe que se estudia. <br className="hidden md:block" />
-          <span className="text-blue-400">Amor que se vive.</span>
+        <h1 className="mb-6 text-5xl font-extrabold tracking-tighter text-[#0d153b] md:text-7xl">
+          IAM FACEA
         </h1>
+        <p className="mx-auto mb-10 max-w-2xl text-xl font-light leading-relaxed text-[#46464e] md:text-2xl">
+          Instituto de alumnos misioneros de la facultad de ciencias económicas
+          y la administración
+        </p>
 
-        {/* Botones de acción (CTAs) */}
-        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <button className="px-8 py-3 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold transition-colors shadow-lg shadow-blue-600/30">
-            Únete este sábado
+        <div className="flex flex-col gap-4 md:flex-row">
+          <button
+            className="rounded-xl bg-[#10183e] px-8 py-4 font-semibold text-white shadow-lg transition-transform duration-300 hover:scale-[1.03]"
+            type="button"
+          >
+            Involúcrate
           </button>
-          <button className="px-8 py-3 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold transition-colors">
-            Ver salidas misioneras
+          <button
+            className="rounded-xl bg-[#e8e8ea] px-8 py-4 font-semibold text-[#0d153b] transition-all duration-300 hover:scale-[1.03] hover:bg-[#e2e2e4]"
+            type="button"
+          >
+            Conoce más
           </button>
         </div>
       </div>
