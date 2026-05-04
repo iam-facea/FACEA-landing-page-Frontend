@@ -118,7 +118,6 @@ function App() {
     <>
       <Navbar />
       <Home />
-      <AboutUs />
     </>
   );
 }
