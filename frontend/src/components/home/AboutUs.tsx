@@ -2,10 +2,10 @@ import { Card } from "../ui/Card";
 import { Container } from "../ui/Container";
 
 // Importa aquí tus imágenes (asegúrate de que las rutas sean correctas)
-import gruposMisioneros from "../../assets/images/Grupos misioneros.jpg";
-import comisionFaros from "../../assets/images/comisionFaros.jpg"; // Ajusta el nombre
-import grupoOracion from "../../assets/images/grupoOracion.jpg"; // Ajusta el nombre
-import musicaImage from "../../assets/images/musicaImage.jpg"; // Ajusta el nombre
+import gruposMisioneros from "../../assets/images/vigilia.jpg";
+import comisionFaros from "../../assets/images/Comision Faros.jpg"; // Ajusta el nombre
+import grupoOracion from "../../assets/images/Grupo-oracion.jpeg"; // Ajusta el nombre
+import musicaImage from "../../assets/images/Musica.jpg"; // Ajusta el nombre
 
 const valores = [
   {
@@ -83,7 +83,7 @@ export const AboutUs = () => {
               <img
                 alt="Escuela Sabática"
                 className="absolute inset-0 h-full w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-105"
-                //src={gruposMisioneros}
+                src={gruposMisioneros}
               />
               <div className="relative z-20 flex h-full flex-col justify-end p-10">
                 <h3 className="mb-2 text-3xl font-bold text-white">
@@ -101,16 +101,10 @@ export const AboutUs = () => {
               <img
                 alt="Grupo Faros"
                 className="absolute inset-0 h-full w-full object-cover opacity-40 transition-transform duration-700 group-hover:scale-105"
-                //src={comisionFaros}
+                src={comisionFaros}
               />
-              <div className="relative z-20 flex h-full flex-col justify-center p-10">
-                <span
-                  className="material-symbols-outlined mb-4 text-[#bd222f]"
-                  style={{ fontSize: 32 }}
-                >
-                  group
-                </span>
-                <h3 className="mb-3 text-xl font-bold text-[#0d153b]">
+              <div className="relative z-20 flex h-full flex-col justify-end p-10">
+                <h3 className="mb-3 text-3xl font-bold text-[#0d153b]">
                   Grupos Faros
                 </h3>
                 <p className="text-sm text-[#46464e]">
@@ -125,10 +119,10 @@ export const AboutUs = () => {
               <img
                 alt="Grupos de Oración"
                 className="absolute inset-0 h-full w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-105"
-                //src={grupoOracion}
+                src={grupoOracion}
               />
               <div className="relative z-20 flex h-full flex-col justify-end p-10">
-                <h3 className="mb-2 text-xl font-bold text-white">
+                <h3 className="mb-2 text-3xl font-bold text-white">
                   Grupos de Oración
                 </h3>
                 <p className="text-sm text-white/80">
@@ -154,7 +148,7 @@ export const AboutUs = () => {
                 <img
                   alt="Comunicación y Música"
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  //src={musicaImage}
+                  src={musicaImage}
                 />
               </div>
             </article>
