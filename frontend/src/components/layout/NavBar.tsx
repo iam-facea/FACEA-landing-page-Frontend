@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "../ui/Button";
+import { useActiveSection } from "../../hooks/useActiveSection";
 import faceaLogo from "../../assets/images/FACEA-logo.png";
 
 export const Navbar = () => {
