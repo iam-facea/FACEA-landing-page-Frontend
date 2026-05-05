@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "../ui/Button";
 import { useActiveSection } from "../../hooks/useActiveSection";
+import { NAV_LINKS } from "../../constants/navigation";
 import faceaLogo from "../../assets/images/FACEA-logo.png";
 
 export const Navbar = () => {
@@ -8,23 +9,14 @@ export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // NUEVO: Estado para saber qué sección está activa (por defecto arranca en 'inicio')
-  const [activeSection, setActiveSection] = useState("inicio");
+  const activeSection = useActiveSection(NAV_LINKS.map((link) => link.id));
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   // Función combinada para cuando alguien hace clic en un enlace
-  const handleNavClick = (sectionId: string) => {
-    setActiveSection(sectionId);
+  const handleNavClick = () => {
     setIsMenuOpen(false); // Si estaba en móvil, cerramos el menú al elegir
   };
-
-  // NUEVO: Arreglo de configuración de rutas. ¡Si agregas uno aquí, aparece en toda la app!
-  const navLinks = [
-    { id: "inicio", label: "Inicio", href: "#inicio" },
-    { id: "nosotros", label: "Nosotros", href: "#nosotros" },
-    { id: "actividades", label: "Novedades", href: "#actividades" },
-    { id: "impacto", label: "Impacto", href: "#impacto" },
-  ];
 
   return (
     <nav className="fixed top-0 z-50 flex h-16 w-full items-center border-b border-slate-200/40 bg-[#f9f9fb]/60 backdrop-blur-md transition-all">
@@ -33,7 +25,7 @@ export const Navbar = () => {
         <div className="z-50 md:hidden">
           <a
             href="#inicio"
-            onClick={() => handleNavClick("inicio")}
+            onClick={handleNavClick}
             aria-label="Volver al inicio"
             className="shrink-0 transition-transform hover:scale-105"
           >
@@ -49,7 +41,7 @@ export const Navbar = () => {
         <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center gap-8">
           <a
             href="#inicio"
-            onClick={() => handleNavClick("inicio")}
+            onClick={handleNavClick}
             aria-label="Volver al inicio"
             className="shrink-0 transition-transform hover:scale-105"
           >
@@ -62,11 +54,11 @@ export const Navbar = () => {
 
           {/* Mapeo dinámico de los enlaces Desktop */}
           <div className="flex items-center gap-6">
-            {navLinks.map((link) => (
+            {NAV_LINKS.map((link) => (
               <a
                 key={link.id}
                 href={link.href}
-                onClick={() => handleNavClick(link.id)}
+                onClick={handleNavClick}
                 // Aquí ocurre la magia del color rojo (#bd222f) vs gris (#64748b)
                 className={`text-sm tracking-wide transition-colors ${
                   activeSection === link.id
@@ -136,11 +128,11 @@ export const Navbar = () => {
       >
         <div className="flex flex-col space-y-4">
           {/* Mapeo dinámico de los enlaces Móviles */}
-          {navLinks.map((link) => (
+          {NAV_LINKS.map((link) => (
             <a
               key={link.id}
               href={link.href}
-              onClick={() => handleNavClick(link.id)}
+              onClick={handleNavClick}
               className={`text-base tracking-wide transition-colors ${
                 activeSection === link.id
                   ? "font-bold text-[#bd222f]"
