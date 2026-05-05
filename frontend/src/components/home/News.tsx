@@ -1,6 +1,8 @@
 import { Container } from "../ui/Container";
 import { PostCard } from "../ui/PostCard";
 import { useEffect, useState } from "react";
+import postData from "../../../data/news/postData.json";
+import { PostForm } from "../ui/PostForm";
 
 // Interfaz para tipificar los posts que vienen del JSON
 interface Post {
@@ -15,38 +17,21 @@ interface Post {
 }
 
 export const News = () => {
-  // Estado para almacenar los posts cargados del JSON
   const [posts, setPosts] = useState<Post[]>([]);
-  // Estado para manejar errores de carga
   const [error, setError] = useState<string | null>(null);
-  // Estado para indicar si está cargando
   const [isLoading, setIsLoading] = useState(true);
 
-  // Efecto para cargar los datos del JSON cuando el componente se monta
   useEffect(() => {
-    const loadPosts = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch("/data/news/postData.json");
-        if (!response.ok) {
-          throw new Error("Error al cargar los posts");
-        }
-        const data = await response.json();
-        // Filtrar solo los posts con estado "publico"
-        const publicPosts = data.posts.filter(
-          (post: Post) => post.post_state_id === "publico"
-        );
-        setPosts(publicPosts);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Error desconocido al cargar posts"
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadPosts();
+    try {
+      setIsLoading(true);
+      // Usamos el JSON importado desde src
+      const publicPosts = postData.posts.filter((p: Post) => p.post_state_id === "publico");
+      setPosts(publicPosts);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error desconocido al cargar posts");
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   return (

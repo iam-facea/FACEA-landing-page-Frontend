@@ -1,0 +1,64 @@
+{
+  "posts": [
+    {
+      "post_id": 1,
+      "title": "Presentación Comisión FACEA 2026",
+      "description": "Conocé a la nueva comisión de FACEA para este año. Estudiantes comprometidos con la misión de nutrir la vida espiritual en nuestro campus.",
+      "category": "Evento",
+      "date": "2026-05-10",
+      "image": "/data/news/images/001-Comicion FACEA.png",
+      "url": "#",
+      "post_state_id": "publico"
+    },
+    {
+      "post_id": 2,
+      "title": "Te esperamos este sábado en la Escuela Sabática",
+      "description": "Únete a nosotros para un tiempo de estudio profundo de las escrituras. Ambiente participativo y reflexivo cada sábado por la mañana.",
+      "category": "Escuela Sabática",
+      "date": "2026-05-08",
+      "image": "/data/news/images/002-Bienvenido.png",
+      "url": "#",
+      "post_state_id": "publico"
+    },
+    {
+      "post_id": 3,
+      "title": "Culto al aire libre",
+      "description": "Este sábado nos reuniremos en un espacio al aire libre para compartir un momento especial de adoración y comunión bajo el cielo.",
+      "category": "Evento",
+      "date": "2026-05-12",
+      "image": "/data/news/images/003-Culto al aire libre.jpg",
+      "url": "#",
+      "post_state_id": "publico"
+    },
+    {
+      "post_id": 4,
+      "title": "¡No te olvides de sonreír! Así fue nuestra fiesta misionera",
+      "description": "Momentos de alegría y servicio. Reviví la energía y el compromiso de nuestro equipo misionero en esta jornada de trabajo y fellowship.",
+      "category": "Misión",
+      "date": "2026-05-05",
+      "image": "/data/news/images/004-No te olvides de soreir.JPG",
+      "url": "#",
+      "post_state_id": "publico"
+    },
+    {
+      "post_id": 5,
+      "title": "Departamento de Música: Alaba a Dios con nosotros",
+      "description": "No te pierdas la oportunidad de participar del departamento de música. Juntos enriquecemos nuestras celebraciones con creatividad y devoción.",
+      "category": "Música",
+      "date": "2026-05-07",
+      "image": "/data/news/images/005-Musica.jpg",
+      "url": "#",
+      "post_state_id": "publico"
+    },
+    {
+      "post_id": 6,
+      "title": "Nuestro primer sábado en Grupos Faros",
+      "description": "Así fue el inicio de esta nueva temporada de pequeños grupos. Comunidades de fe reunidas en hogares para compartir la vida y la Biblia.",
+      "category": "Comunidad",
+      "date": "2026-05-03",
+      "image": "/data/news/images/006-Faros-Ricon.jpg",
+      "url": "#",
+      "post_state_id": "publico"
+    }
+  ]
+}
