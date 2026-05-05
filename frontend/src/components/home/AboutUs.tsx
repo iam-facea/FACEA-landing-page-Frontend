@@ -7,7 +7,7 @@ import comisionFaros from "../../assets/images/Comision Faros.jpg"; // Ajusta el
 import grupoOracion from "../../assets/images/Grupo-oracion.jpeg"; // Ajusta el nombre
 import musicaImage from "../../assets/images/Musica.jpg"; // Ajusta el nombre
 
-const valores = [
+const values = [
   {
     id: "origen",
     icono: "history_edu",
@@ -53,19 +53,19 @@ export const AboutUs = () => {
 
         {/* TARJETAS DE VALORES (Usando tu UI Kit) */}
         <div className="mb-24 grid gap-8 md:grid-cols-3">
-          {valores.map((valor) => (
-            <Card key={valor.id} hoverEffect={true} padding="lg">
+          {values.map((value) => (
+            <Card key={value.id} hoverEffect={true} padding="lg">
               <span
                 className="material-symbols-outlined mb-4 text-[#bd222f]"
                 style={{ fontSize: 40 }}
               >
-                {valor.icono}
+                {value.icono}
               </span>
               <h3 className="mb-3 text-xl font-bold text-[#0d153b]">
-                {valor.titulo}
+                {value.titulo}
               </h3>
               <p className="text-sm leading-relaxed text-[#46464e]">
-                {valor.texto}
+                {value.texto}
               </p>
             </Card>
           ))}
