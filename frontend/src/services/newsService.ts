@@ -7,7 +7,6 @@ export interface NewsPost {
   date: string;
 }
 
-// Nuestra "Base de Datos" temporal en memoria
 let mockDatabase: NewsPost[] = [
   {
     id: "1",
@@ -18,7 +17,6 @@ let mockDatabase: NewsPost[] = [
 ];
 
 export const newsService = {
-  // TU TURNO: Retornar mockDatabase simulando 1 segundo de latencia con una Promise y setTimeout
   getAll: async (): Promise<NewsPost[]> => {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -27,8 +25,6 @@ export const newsService = {
     });
   },
 
-  // TU TURNO: Generar un ID (puedes usar Date.now().toString()), armar el objeto NewsPost, 
-  // pushearlo a mockDatabase y retornarlo con latencia.
   create: async (postData: Omit<NewsPost, "id" | "date">): Promise<NewsPost> => {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -44,7 +40,6 @@ export const newsService = {
     });
   },
 
-  // TU TURNO: Filtrar mockDatabase para quitar el post con el ID recibido, y retornar true con latencia.
   delete: async (id: string): Promise<boolean> => {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -52,6 +47,5 @@ export const newsService = {
         resolve(true);
       }, 1000);
     });
-    // Escribe tu lógica aquí
   },
 };
