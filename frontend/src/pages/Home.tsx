@@ -1,5 +1,14 @@
+import { HeroBanner } from "../components/home/HeroBanner";
+import { AboutUs } from "../components/home/AboutUs";
+import { News } from "../components/home/News";
 const Home = () => {
-    return <h1>Home FACEA</h1>;
+  return (
+    <>
+      <HeroBanner />
+      <AboutUs />
+      <News />
+    </>
+  );
 };
 
 export default Home;
