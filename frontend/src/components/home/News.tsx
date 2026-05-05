@@ -1,46 +1,47 @@
 import { Container } from "../ui/Container";
+import { PostCard } from "../ui/PostCard";
 
-// 1. MOCK DE LA BASE DE DATOS:
-// Así es exactamente como se verá el JSON que nos devuelva la API en el futuro.
+// 1. MOCK DE BASE DE DATOS:
+// Así se verían los datos que después podrían venir desde una API.
 const mockPosts = [
   {
     id: 1,
-    etiqueta: "Evento",
-    titulo: "Jornada de Liderazgo 2026",
-    fecha: "15 de Mayo, 2026",
-    imagen:
+    category: "Evento",
+    title: "Jornada de Liderazgo 2026",
+    date: "15 de Mayo, 2026",
+    image:
       "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1000&auto=format&fit=crop",
-    descripcion:
+    description:
       "Un encuentro intensivo para desarrollar habilidades de liderazgo basadas en principios cristianos.",
   },
   {
     id: 2,
-    etiqueta: "Misión",
-    titulo: "Viaje Solidario al Norte",
-    fecha: "20 de Junio, 2026",
-    imagen:
+    category: "Misión",
+    title: "Viaje Solidario al Norte",
+    date: "20 de Junio, 2026",
+    image:
       "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=1000&auto=format&fit=crop",
-    descripcion:
+    description:
       "Sumate a nuestro equipo de voluntarios para llevar recursos y esperanza a comunidades rurales.",
   },
   {
     id: 3,
-    etiqueta: "Académico",
-    titulo: "Taller de Finanzas Éticas",
-    fecha: "10 de Agosto, 2026",
-    imagen:
+    category: "Académico",
+    title: "Taller de Finanzas Éticas",
+    date: "10 de Agosto, 2026",
+    image:
       "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1000&auto=format&fit=crop",
-    descripcion:
+    description:
       "Cómo aplicar los valores de FACEA en el mundo empresarial moderno y la toma de decisiones.",
   },
   {
     id: 4,
-    etiqueta: "Comunidad",
-    titulo: "Encuentro de Ex-Alumnos",
-    fecha: "05 de Septiembre, 2026",
-    imagen:
+    category: "Comunidad",
+    title: "Encuentro de Ex-Alumnos",
+    date: "05 de Septiembre, 2026",
+    image:
       "https://images.unsplash.com/photo-1523580494112-071ef046dd41?q=80&w=1000&auto=format&fit=crop",
-    descripcion:
+    description:
       "Una noche para reconectar, compartir testimonios y ver el impacto de nuestra red.",
   },
 ];
@@ -86,36 +87,14 @@ export const News = () => {
               desborden hasta el borde infinito de la pantalla */}
 
           {mockPosts.map((post) => (
-            <article
+            <PostCard
               key={post.id}
-              className="group relative flex h-[450px] w-[85vw] shrink-0 snap-center flex-col justify-end overflow-hidden rounded-3xl bg-slate-800 md:h-[500px] md:w-[600px]"
-            >
-              {/* Imagen de fondo con efecto zoom al pasar el mouse */}
-              <img
-                src={post.imagen}
-                alt={post.titulo}
-                className="absolute inset-0 h-full w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-105"
-              />
-
-              {/* Gradiente oscuro abajo para que el texto siempre sea legible */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-              {/* Contenido de la tarjeta */}
-              <div className="relative z-10 p-8 md:p-10">
-                <div className="mb-4 flex items-center gap-3">
-                  <span className="rounded-full bg-[#bd222f] px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
-                    {post.etiqueta}
-                  </span>
-                  <span className="text-sm font-medium text-white/80">
-                    {post.fecha}
-                  </span>
-                </div>
-                <h3 className="mb-3 text-2xl font-bold leading-tight md:text-3xl">
-                  {post.titulo}
-                </h3>
-                <p className="line-clamp-2 text-white/70">{post.descripcion}</p>
-              </div>
-            </article>
+              category={post.category}
+              title={post.title}
+              date={post.date}
+              image={post.image}
+              description={post.description}
+            />
           ))}
         </div>
       </div>
