@@ -1,5 +1,6 @@
 // src/components/ui/PostCard.tsx
 import React from "react";
+import faceaLogo from "../../assets/images/FACEA-logo.png";
 
 interface PostCardProps {
   post: {
@@ -31,8 +32,16 @@ export const PostCard = ({ post, isLarge = false }: PostCardProps) => {
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
 
       {post.etiqueta && (
-        <div className="absolute top-5 right-5 z-20 rounded-full bg-white/20 px-4 py-1.5 backdrop-blur-md border border-white/10">
-          <span className="text-xs font-bold tracking-wider text-white uppercase shadow-sm">
+        <div className="absolute top-5 right-5 z-20 flex items-center gap-2 rounded-full bg-white/20 px-3 py-1.5 backdrop-blur-md border border-white/10">
+          {/* El Logo de FACEA */}
+          <img
+            src={faceaLogo}
+            alt="FACEA"
+            className="h-6 w-auto object-contain drop-shadow-md"
+          />
+
+          {/* El Texto de la Etiqueta */}
+          <span className="text-xs font-bold tracking-wider text-white uppercase shadow-sm mt-[1px]">
             {post.etiqueta}
           </span>
         </div>
