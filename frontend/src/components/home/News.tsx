@@ -73,17 +73,20 @@ export const News = () => {
 
   // 2. EFECTO ACTUALIZADO: Depende de 'isPaused'
   useEffect(() => {
-    // Si el usuario tiene el mouse encima (isPaused es true),
-    // cortamos la ejecución acá y no creamos el intervalo.
+    // Si está pausado (mouse encima), no hacemos nada y el reloj se detiene
     if (isPaused) return;
 
-    const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % total);
+    // Usamos setTimeout. Este creará una cuenta regresiva de 4s
+    const timer = setTimeout(() => {
+      // Usamos la función next() en lugar del set directo para mantener la lógica limpia
+      next();
     }, 4000);
 
-    // Función de limpieza de memoria (esencial en React)
-    return () => clearInterval(interval);
-  }, [isPaused, total]); // Agregamos dependencias para que reaccione a los cambios
+    // Función de limpieza: Si el usuario hace clic manual (cambia activeIndex)
+    // o pone el mouse encima (cambia isPaused), borramos el reloj anterior
+    // para que no se superpongan.
+    return () => clearTimeout(timer);
+  }, [activeIndex, isPaused]);
 
   const getCardPosition = (index: number) => {
     let offset = index - activeIndex;
@@ -120,12 +123,8 @@ export const News = () => {
         </div>
       </Container>
 
-      {/* 3. EVENTOS MOUSE: Le decimos a React qué hacer cuando entra o sale el cursor */}
-      <div
-        className="relative h-[450px] w-full md:h-[550px]"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-      >
+      {/* 3. EVENTOS MOUSE: Ahora están en CADA tarjeta, no en el contenedor gigante */}
+      <div className="relative h-[450px] w-full md:h-[550px]">
         {mockPosts.map((post, index) => {
           const positionClasses = getCardPosition(index);
           const isCenter = index === activeIndex;
@@ -133,6 +132,9 @@ export const News = () => {
           return (
             <div
               key={post.id}
+              // AQUÍ ESTÁ LA MAGIA: El hover ahora es estrictamente sobre la tarjeta
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
               onClick={() => {
                 const offset = index - activeIndex;
                 if (offset === 1 || offset === -(total - 1)) next();
