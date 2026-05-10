@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Container } from "../ui/Container";
 import { PostCard } from "../ui/PostCard";
 
@@ -60,58 +60,59 @@ const mockPosts = [
     descripcion:
       "Un encuentro intensivo para desarrollar habilidades de liderazgo basadas en principios cristianos.",
   },
-  {
-    id: 7,
-    etiqueta: "Evento",
-    titulo: "Jornada de Liderazgo 2026",
-    fecha: "15 de Mayo, 2026",
-    imagen:
-      "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1000&auto=format&fit=crop",
-    descripcion:
-      "Un encuentro intensivo para desarrollar habilidades de liderazgo basadas en principios cristianos.",
-  },
-  {
-    id: 8,
-    etiqueta: "Evento",
-    titulo: "Jornada de Liderazgo 2026",
-    fecha: "15 de Mayo, 2026",
-    imagen:
-      "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1000&auto=format&fit=crop",
-    descripcion:
-      "Un encuentro intensivo para desarrollar habilidades de liderazgo basadas en principios cristianos.",
-  },
 ];
 
 export const News = () => {
-  // 1. Referencia al contenedor del carrusel para poder moverlo con JavaScript
-  const carouselRef = useRef<HTMLDivElement>(null);
+  // 1. Estado: Sabemos exactamente qué tarjeta está en el centro
+  const [activeIndex, setActiveIndex] = useState(0);
+  const total = mockPosts.length;
 
-  // 2. Efecto de Auto-Scroll Nativo
+  // 2. Funciones para avanzar y retroceder en círculo
+  const next = () => setActiveIndex((prev) => (prev + 1) % total);
+  const prev = () => setActiveIndex((prev) => (prev - 1 + total) % total);
+
+  // 3. Auto-movimiento cada 4 segundos
   useEffect(() => {
     const interval = setInterval(() => {
-      if (carouselRef.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+      next();
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []); // El array vacío es correcto porque usamos la función callback (prev) en el set state
 
-        // Si llegamos al final del scroll, volvemos a cero de forma suave
-        if (scrollLeft + clientWidth >= scrollWidth - 10) {
-          carouselRef.current.scrollTo({ left: 0, behavior: "smooth" });
-        } else {
-          // Si no, avanzamos 400px a la derecha
-          carouselRef.current.scrollBy({ left: 400, behavior: "smooth" });
-        }
-      }
-    }, 4000); // Se mueve cada 4 segundos
+  // 4. La matemática del círculo: Calcula dónde va cada tarjeta respecto a la activa
+  const getCardPosition = (index: number) => {
+    let offset = index - activeIndex;
 
-    return () => clearInterval(interval); // Limpiamos el intervalo si el usuario cambia de página
-  }, []);
+    // Magia modular: Si estamos en la 1ra tarjeta (0), la última (5) se vuelve la "anterior" (-1)
+    if (offset < -Math.floor(total / 2)) offset += total;
+    if (offset > Math.floor(total / 2)) offset -= total;
+
+    // Asignamos las clases de Tailwind según su posición (offset)
+    if (offset === 0) {
+      // LA CENTRADA (Activa y Grande)
+      return "translate-x-[-50%] scale-100 opacity-100 z-30 shadow-2xl";
+    } else if (offset === -1) {
+      // LA DE LA IZQUIERDA (Pequeña y opaca)
+      return "translate-x-[-155%] md:translate-x-[-140%] lg:translate-x-[-165%] scale-[0.85] opacity-50 z-20 cursor-pointer hover:opacity-100";
+    } else if (offset === 1) {
+      // LA DE LA DERECHA (Pequeña y opaca)
+      return "translate-x-[55%] md:translate-x-[40%] lg:translate-x-[65%] scale-[0.85] opacity-50 z-20 cursor-pointer hover:opacity-100";
+    } else if (offset < -1) {
+      // OCULTAS A LA IZQUIERDA
+      return "translate-x-[-250%] scale-[0.7] opacity-0 z-10 pointer-events-none";
+    } else {
+      // OCULTAS A LA DERECHA
+      return "translate-x-[150%] scale-[0.7] opacity-0 z-10 pointer-events-none";
+    }
+  };
 
   return (
     <section
       id="actividades"
-      className="bg-[#10183e] py-24 text-white overflow-hidden"
+      className="bg-[#10183e] py-24 text-white overflow-hidden relative"
     >
       <Container>
-        <div className="mb-12">
+        <div className="mb-16">
           <span className="text-xs font-bold uppercase tracking-[0.1em] text-[#bd222f]">
             Últimas Noticias
           </span>
@@ -121,32 +122,29 @@ export const News = () => {
         </div>
       </Container>
 
-      {/* CONTENEDOR DEL CARRUSEL (Estilo Grid Asimétrico) */}
-      <div className="relative w-full">
-        <div
-          ref={carouselRef}
-          // Grid de 2 filas, flujo horizontal.
-          className="grid grid-rows-2 grid-flow-col gap-4 overflow-x-auto px-6 pb-12 pt-4 snap-x snap-mandatory hide-scrollbar lg:px-8 xl:px-[calc((100vw-1280px)/2+32px)]"
-        >
-          {mockPosts.map((post, index) => {
-            const isLarge = index % 3 === 0;
+      {/* CONTENEDOR DEL CARRUSEL (Altura fija para las posiciones absolutas) */}
+      <div className="relative h-[450px] w-full md:h-[550px]">
+        {mockPosts.map((post, index) => {
+          const positionClasses = getCardPosition(index);
+          const isCenter = index === activeIndex;
 
-            return (
-              // EL ASIENTO DEL TREN: El padre define el tamaño y la posición en la grilla
-              <div
-                key={post.id}
-                className={`shrink-0 snap-center ${
-                  isLarge
-                    ? "row-span-2 h-[500px] w-[85vw] md:w-[600px]"
-                    : "row-span-1 h-[242px] w-[85vw] md:w-[400px]"
-                }`}
-              >
-                {/* EL PASAJERO: La tarjeta se adapta a ese asiento */}
-                <PostCard post={post} isLarge={isLarge} />
-              </div>
-            );
-          })}
-        </div>
+          return (
+            <div
+              key={post.id}
+              // Al hacer clic en una tarjeta de los costados, la traemos al centro
+              onClick={() => {
+                const offset = index - activeIndex;
+                if (offset === 1 || offset === -(total - 1)) next();
+                if (offset === -1 || offset === total - 1) prev();
+              }}
+              // Todas las tarjetas arrancan en el centro (left-1/2) y las movemos con Transform
+              className={`absolute left-1/2 top-0 h-[400px] w-[80vw] max-w-[500px] md:h-[500px] transition-all duration-[800ms] ease-[cubic-bezier(0.25,1,0.35,1)] ${positionClasses}`}
+            >
+              {/* Le avisamos a PostCard si es la del centro para que muestre la descripción */}
+              <PostCard post={post} isLarge={isCenter} />
+            </div>
+          );
+        })}
       </div>
     </section>
   );
