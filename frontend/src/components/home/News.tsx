@@ -63,45 +63,43 @@ const mockPosts = [
 ];
 
 export const News = () => {
-  // 1. Estado: Sabemos exactamente qué tarjeta está en el centro
   const [activeIndex, setActiveIndex] = useState(0);
+  // 1. NUEVO ESTADO: Controla si el carrusel está pausado
+  const [isPaused, setIsPaused] = useState(false);
   const total = mockPosts.length;
 
-  // 2. Funciones para avanzar y retroceder en círculo
   const next = () => setActiveIndex((prev) => (prev + 1) % total);
   const prev = () => setActiveIndex((prev) => (prev - 1 + total) % total);
 
-  // 3. Auto-movimiento cada 4 segundos
+  // 2. EFECTO ACTUALIZADO: Depende de 'isPaused'
   useEffect(() => {
-    const interval = setInterval(() => {
-      next();
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []); // El array vacío es correcto porque usamos la función callback (prev) en el set state
+    // Si el usuario tiene el mouse encima (isPaused es true),
+    // cortamos la ejecución acá y no creamos el intervalo.
+    if (isPaused) return;
 
-  // 4. La matemática del círculo: Calcula dónde va cada tarjeta respecto a la activa
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % total);
+    }, 4000);
+
+    // Función de limpieza de memoria (esencial en React)
+    return () => clearInterval(interval);
+  }, [isPaused, total]); // Agregamos dependencias para que reaccione a los cambios
+
   const getCardPosition = (index: number) => {
     let offset = index - activeIndex;
 
-    // Magia modular: Si estamos en la 1ra tarjeta (0), la última (5) se vuelve la "anterior" (-1)
     if (offset < -Math.floor(total / 2)) offset += total;
     if (offset > Math.floor(total / 2)) offset -= total;
 
-    // Asignamos las clases de Tailwind según su posición (offset)
     if (offset === 0) {
-      // LA CENTRADA (Activa y Grande)
       return "translate-x-[-50%] scale-100 opacity-100 z-30 shadow-2xl";
     } else if (offset === -1) {
-      // LA DE LA IZQUIERDA (Pequeña y opaca)
       return "translate-x-[-155%] md:translate-x-[-140%] lg:translate-x-[-165%] scale-[0.85] opacity-50 z-20 cursor-pointer hover:opacity-100";
     } else if (offset === 1) {
-      // LA DE LA DERECHA (Pequeña y opaca)
       return "translate-x-[55%] md:translate-x-[40%] lg:translate-x-[65%] scale-[0.85] opacity-50 z-20 cursor-pointer hover:opacity-100";
     } else if (offset < -1) {
-      // OCULTAS A LA IZQUIERDA
       return "translate-x-[-250%] scale-[0.7] opacity-0 z-10 pointer-events-none";
     } else {
-      // OCULTAS A LA DERECHA
       return "translate-x-[150%] scale-[0.7] opacity-0 z-10 pointer-events-none";
     }
   };
@@ -122,8 +120,12 @@ export const News = () => {
         </div>
       </Container>
 
-      {/* CONTENEDOR DEL CARRUSEL (Altura fija para las posiciones absolutas) */}
-      <div className="relative h-[450px] w-full md:h-[550px]">
+      {/* 3. EVENTOS MOUSE: Le decimos a React qué hacer cuando entra o sale el cursor */}
+      <div
+        className="relative h-[450px] w-full md:h-[550px]"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
         {mockPosts.map((post, index) => {
           const positionClasses = getCardPosition(index);
           const isCenter = index === activeIndex;
@@ -131,16 +133,13 @@ export const News = () => {
           return (
             <div
               key={post.id}
-              // Al hacer clic en una tarjeta de los costados, la traemos al centro
               onClick={() => {
                 const offset = index - activeIndex;
                 if (offset === 1 || offset === -(total - 1)) next();
                 if (offset === -1 || offset === total - 1) prev();
               }}
-              // Todas las tarjetas arrancan en el centro (left-1/2) y las movemos con Transform
               className={`absolute left-1/2 top-0 h-[400px] w-[80vw] max-w-[500px] md:h-[500px] transition-all duration-[800ms] ease-[cubic-bezier(0.25,1,0.35,1)] ${positionClasses}`}
             >
-              {/* Le avisamos a PostCard si es la del centro para que muestre la descripción */}
               <PostCard post={post} isLarge={isCenter} />
             </div>
           );
