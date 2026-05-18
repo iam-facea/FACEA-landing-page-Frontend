@@ -1,0 +1,17 @@
+.facea-logo {
+  width: min(70vw, 260px);
+  height: auto;
+  display: block;
+  animation: facea-spin 900ms ease-in-out;
+  transform-origin: center center;
+}
+
+@keyframes facea-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
