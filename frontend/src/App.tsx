@@ -4,14 +4,8 @@ import Home from "./pages/Home";
 import { LoginPage } from "./pages/LoginPage";
 import { NavBar } from "./components/layout/NavBar";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
-
-// Un componente temporal para el Admin
-const AdminDashboard = () => (
-  <div className="p-20 text-center">
-    <h1 className="text-3xl font-bold">Panel de Administración de Novedades</h1>
-    <p>Aquí irá tu CRUD de noticias pronto...</p>
-  </div>
-);
+import { EditorPage } from "./pages/EditorPage";
+import { Navigate } from "react-router-dom";
 
 function App() {
   return (
@@ -31,15 +25,18 @@ function App() {
         {/* Ruta de Login */}
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Ruta Protegida: Admin */}
+        {/* Ruta Protegida: Editor */}
         <Route
-          path="/admin"
+          path="/editor"
           element={
             <ProtectedRoute>
-              <AdminDashboard />
+              <EditorPage />
             </ProtectedRoute>
           }
         />
+
+        {/* Alias antiguo para no romper enlaces previos */}
+        <Route path="/admin" element={<Navigate to="/editor" replace />} />
       </Routes>
     </BrowserRouter>
   );

@@ -18,7 +18,7 @@ export const LoginPage = () => {
 
     try {
       const success = await authService.login(username, password);
-      if (success) navigate("/admin");
+      if (success) navigate("/editor");
     } catch (err) {
       setError(err as string);
     } finally {
