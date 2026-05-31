@@ -5,7 +5,7 @@ import { useActiveSection } from "../../hooks/useActiveSection";
 import { NAV_LINKS, NAV_IDS } from "../../constants/navigation";
 import faceaLogo from "../../assets/images/FACEA-logo.png";
 
-export const Navbar = () => {
+export const NavBar = () => {
   // Estado para el menú móvil
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
