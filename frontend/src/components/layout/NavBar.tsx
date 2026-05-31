@@ -1,42 +1,50 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useEffect } from "react";
 import { Button } from "../ui/Button";
 import { useActiveSection } from "../../hooks/useActiveSection";
 import { NAV_LINKS, NAV_IDS } from "../../constants/navigation";
 import faceaLogo from "../../assets/images/FACEA-logo.png";
 
 export const NavBar = () => {
+  // Estado para el menú mobile (abierto/cerrado)
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Estado para saber qué sección está activa (por defecto arranca en 'inicio')
   const activeSection = useActiveSection(NAV_IDS);
 
-  // 1. Usamos la clase de Tailwind en lugar de modificar el estilo inline
+  // NUEVO: Bloqueo de scroll a prueba de balas (HTML y BODY)
   useEffect(() => {
     if (isMenuOpen) {
-      document.body.classList.add("overflow-hidden");
+      document.documentElement.style.overflow = "hidden"; // Bloquea el <html>
+      document.body.style.overflow = "hidden"; // Bloquea el <body>
     } else {
-      document.body.classList.remove("overflow-hidden");
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
     }
 
     // Limpieza de seguridad
     return () => {
-      document.body.classList.remove("overflow-hidden");
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
     };
   }, [isMenuOpen]);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
+  // Función combinada para cuando alguien hace clic en un enlace
   const handleNavClick = () => {
-    setIsMenuOpen(false);
+    setIsMenuOpen(false); // Si estaba en móvil, cerramos el menú al elegir
   };
 
   return (
-    <nav className="fixed top-0 z-50 flex h-16 w-full items-center border-b border-slate-200/40 bg-[#f9f9fb]/90 backdrop-blur-md transition-all">
-      {/* CONTENEDOR PRINCIPAL DE LA BARRA (Debe estar por encima de todo, z-50) */}
-      <div className="relative z-50 mx-auto flex w-full max-w-7xl items-center px-6 lg:px-8">
-        {/* MÓVIL: Logo */}
-        <div className="md:hidden">
+    <nav className="fixed top-0 z-50 flex h-16 w-full items-center border-b border-slate-200/40 bg-[#f9f9fb]/60 backdrop-blur-md transition-all">
+      <div className="relative mx-auto flex w-full max-w-7xl items-center px-6 lg:px-8">
+        {/* 1. MÓVIL: Logo a la izquierda */}
+        <div className="z-50 md:hidden">
           <a
             href="#inicio"
             onClick={handleNavClick}
+            aria-label="Volver al inicio"
             className="shrink-0 transition-transform hover:scale-105"
           >
             <img
@@ -47,11 +55,12 @@ export const NavBar = () => {
           </a>
         </div>
 
-        {/* DESKTOP: Logo + Enlaces */}
+        {/* 2. DESKTOP: Logo + Enlaces en el CENTRO ABSOLUTO */}
         <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center gap-8">
           <a
             href="#inicio"
             onClick={handleNavClick}
+            aria-label="Volver al inicio"
             className="shrink-0 transition-transform hover:scale-105"
           >
             <img
@@ -60,12 +69,15 @@ export const NavBar = () => {
               className="h-8 w-auto object-contain"
             />
           </a>
+
+          {/* Mapeo dinámico de los enlaces Desktop */}
           <div className="flex items-center gap-6">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.id}
                 href={link.href}
                 onClick={handleNavClick}
+                // Aquí ocurre la magia del color rojo (#bd222f) vs gris (#64748b)
                 className={`text-sm tracking-wide transition-colors ${
                   activeSection === link.id
                     ? "font-bold text-[#bd222f]"
@@ -78,8 +90,8 @@ export const NavBar = () => {
           </div>
         </div>
 
-        {/* DERECHA: Botón y Menú Hamburguesa */}
-        <div className="ml-auto flex items-center">
+        {/* 3. DERECHA: Botón CTA y Menú Hamburguesa */}
+        <div className="ml-auto flex items-center z-50">
           <div className="hidden md:block">
             <Button variant="primary" size="sm">
               Tienda y Donaciones
@@ -124,24 +136,16 @@ export const NavBar = () => {
         </div>
       </div>
 
-      {/* 2. LA MAGIA: El Overlay (Guardaespaldas del scroll) */}
-      {/* 'touch-none' bloquea todo intento de scroll nativo en móviles */}
+      {/* 4. MENÚ DESPLEGABLE MÓVIL */}
       <div
-        className={`fixed inset-0 top-16 z-40 bg-black/20 backdrop-blur-sm touch-none transition-opacity duration-300 md:hidden ${
-          isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
-        }`}
-        onClick={handleNavClick}
-      />
-
-      {/* 3. MENÚ DESPLEGABLE MÓVIL (Por encima del overlay, z-50) */}
-      <div
-        className={`absolute left-0 top-16 w-full z-50 border-b border-slate-200/40 bg-[#f9f9fb] p-6 shadow-xl md:hidden origin-top transform transition-all duration-300 ease-out ${
+        className={`absolute left-0 top-16 w-full border-b border-slate-200/40 bg-[#f9f9fb]/95 p-6 shadow-xl backdrop-blur-xl md:hidden origin-top transform transition-all duration-300 ease-out ${
           isMenuOpen
             ? "visible translate-y-0 opacity-100"
             : "invisible -translate-y-4 opacity-0"
         }`}
       >
         <div className="flex flex-col space-y-4">
+          {/* Mapeo dinámico de los enlaces Móviles */}
           {NAV_LINKS.map((link) => (
             <a
               key={link.id}
@@ -156,8 +160,9 @@ export const NavBar = () => {
               {link.label}
             </a>
           ))}
+
           <div className="mt-4 border-t border-slate-200 pt-6">
-            <Button variant="primary" fullWidth onClick={handleNavClick}>
+            <Button variant="primary" fullWidth onClick={toggleMenu}>
               Tienda y Donaciones
             </Button>
           </div>
