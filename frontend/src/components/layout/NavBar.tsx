@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEffect } from "react";
 import { Button } from "../ui/Button";
 import { useActiveSection } from "../../hooks/useActiveSection";
 import { NAV_LINKS, NAV_IDS } from "../../constants/navigation";
@@ -10,6 +11,20 @@ export const Navbar = () => {
 
   // NUEVO: Estado para saber qué sección está activa (por defecto arranca en 'inicio')
   const activeSection = useActiveSection(NAV_IDS);
+
+  // NUEVO: Bloqueo de scroll cuando el menú móvil está abierto
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = "hidden"; // Esconde la barra de scroll y bloquea
+    } else {
+      document.body.style.overflow = "unset"; // Lo devuelve a la normalidad
+    }
+
+    // Limpieza de seguridad por si el componente se desmonta
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isMenuOpen]);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
