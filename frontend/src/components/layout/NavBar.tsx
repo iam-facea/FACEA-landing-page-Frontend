@@ -12,17 +12,20 @@ export const NavBar = () => {
   // NUEVO: Estado para saber qué sección está activa (por defecto arranca en 'inicio')
   const activeSection = useActiveSection(NAV_IDS);
 
-  // NUEVO: Bloqueo de scroll cuando el menú móvil está abierto
+  // NUEVO: Bloqueo de scroll a prueba de balas (HTML y BODY)
   useEffect(() => {
     if (isMenuOpen) {
-      document.body.style.overflow = "hidden"; // Esconde la barra de scroll y bloquea
+      document.documentElement.style.overflow = "hidden"; // Bloquea el <html>
+      document.body.style.overflow = "hidden"; // Bloquea el <body>
     } else {
-      document.body.style.overflow = "unset"; // Lo devuelve a la normalidad
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
     }
 
-    // Limpieza de seguridad por si el componente se desmonta
+    // Limpieza de seguridad
     return () => {
-      document.body.style.overflow = "unset";
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
     };
   }, [isMenuOpen]);
 
