@@ -10,8 +10,10 @@ export const News = () => {
 
   const total = posts.length;
 
-  const next = () => setActiveIndex((prev) => (total === 0 ? 0 : (prev + 1) % total));
-  const prev = () => setActiveIndex((prev) => (total === 0 ? 0 : (prev - 1 + total) % total));
+  const next = () =>
+    setActiveIndex((prev) => (total === 0 ? 0 : (prev + 1) % total));
+  const prev = () =>
+    setActiveIndex((prev) => (total === 0 ? 0 : (prev - 1 + total) % total));
 
   useEffect(() => {
     if (isPaused || total === 0) return;
@@ -42,14 +44,13 @@ export const News = () => {
     }
   };
 
-  if (isLoading) {
-    return null;
-  }
+  // BORRAMOS EL: if (isLoading) return null;
 
   return (
+    // 1. La sección y el ID AHORA SIEMPRE EXISTEN, sin importar si está cargando
     <section
       id="actividades"
-      className="bg-[#10183e] py-24 text-white overflow-hidden relative"
+      className="bg-[#10183e] py-24 text-white overflow-hidden relative min-h-[600px]"
     >
       <Container>
         <div className="mb-16">
@@ -62,28 +63,37 @@ export const News = () => {
         </div>
       </Container>
 
-      <div className="relative h-[450px] w-full md:h-[550px]">
-        {posts.map((post, index) => {
-          const positionClasses = getCardPosition(index);
-          const isCenter = index === activeIndex;
+      {/* 2. Aquí hacemos la división lógica: Si carga, mostramos el "esqueleto", si no, el carrusel */}
+      {isLoading ? (
+        <div className="flex h-[450px] items-center justify-center w-full md:h-[550px]">
+          <p className="text-xl text-white/50 animate-pulse">
+            Cargando novedades...
+          </p>
+        </div>
+      ) : (
+        <div className="relative h-[450px] w-full md:h-[550px]">
+          {posts.map((post, index) => {
+            const positionClasses = getCardPosition(index);
+            const isCenter = index === activeIndex;
 
-          return (
-            <div
-              key={post.post_id}
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
-              onClick={() => {
-                const offset = index - activeIndex;
-                if (offset === 1 || offset === -(total - 1)) next();
-                if (offset === -1 || offset === total - 1) prev();
-              }}
-              className={`absolute left-1/2 top-0 h-[400px] w-[80vw] max-w-[500px] md:h-[500px] transition-all duration-[800ms] ease-[cubic-bezier(0.25,1,0.35,1)] ${positionClasses}`}
-            >
-              <PostCard post={post} isLarge={isCenter} />
-            </div>
-          );
-        })}
-      </div>
+            return (
+              <div
+                key={post.post_id}
+                onMouseEnter={() => setIsPaused(true)}
+                onMouseLeave={() => setIsPaused(false)}
+                onClick={() => {
+                  const offset = index - activeIndex;
+                  if (offset === 1 || offset === -(total - 1)) next();
+                  if (offset === -1 || offset === total - 1) prev();
+                }}
+                className={`absolute left-1/2 top-0 h-[400px] w-[80vw] max-w-[500px] md:h-[500px] transition-all duration-[800ms] ease-[cubic-bezier(0.25,1,0.35,1)] ${positionClasses}`}
+              >
+                <PostCard post={post} isLarge={isCenter} />
+              </div>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 };
