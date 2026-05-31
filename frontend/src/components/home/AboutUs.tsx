@@ -84,6 +84,7 @@ export const AboutUs = () => {
                 alt="Escuela Sabática"
                 className="absolute inset-0 h-full w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-105"
                 src={gruposMisioneros}
+                loading="lazy"
               />
               <div className="relative z-20 flex h-full flex-col justify-end p-10">
                 <h3 className="mb-2 text-3xl font-bold text-white">
@@ -102,6 +103,7 @@ export const AboutUs = () => {
                 alt="Grupo Faros"
                 className="absolute inset-0 h-full w-full object-cover opacity-40 transition-transform duration-700 group-hover:scale-105"
                 src={comisionFaros}
+                loading="lazy"
               />
               <div className="relative z-20 flex h-full flex-col justify-end p-10">
                 <h3 className="mb-3 text-3xl font-bold text-[#0d153b]">
@@ -120,6 +122,7 @@ export const AboutUs = () => {
                 alt="Grupos de Oración"
                 className="absolute inset-0 h-full w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-105"
                 src={grupoOracion}
+                loading="lazy"
               />
               <div className="relative z-20 flex h-full flex-col justify-end p-10">
                 <h3 className="mb-2 text-3xl font-bold text-white">
@@ -149,6 +152,7 @@ export const AboutUs = () => {
                   alt="Comunicación y Música"
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                   src={musicaImage}
+                  loading="lazy"
                 />
               </div>
             </article>

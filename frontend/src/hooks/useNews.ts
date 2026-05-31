@@ -1,59 +1,91 @@
-import { useState, useEffect } from "react";
-import { newsService, type NewsPost } from "../services/newsService";
+import { useEffect, useState } from "react";
+import { newsService, type Post } from "../services/newsService";
 
-export const useNews = () => {
-  // Estados de dominio (los datos reales de tu aplicación)
-  const [posts, setPosts] = useState<NewsPost[]>([]);
+type NewsMode = "published" | "all";
+
+export const useNews = (mode: NewsMode = "published") => {
+  const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // MISIÓN 1: La carga inicial
-  useEffect(() => {
-    const fetchPosts = async () => {
-      setIsLoading(true);
-      try {
-        const data = await newsService.getAll();
-        setPosts(data);
-      } catch (error) {
-        console.error("Error al cargar las novedades:", error);
-      } finally {
-        setIsLoading(false); // Ya sea que falle o tenga éxito, quitamos el loader
-      }
-    };
+  const loadPosts = async (nextMode: NewsMode = mode) => {
+    setIsLoading(true);
+    setError(null);
 
-    fetchPosts();
-  }, []);
-
-  // MISIÓN 2: Crear la novedad
-  const createPost = async (title: string, content: string) => {
     try {
-      const newPost = await newsService.create({ title, content });
-      // Actualizamos el estado insertando la nueva novedad al principio del arreglo
+      const data =
+        nextMode === "published"
+          ? await newsService.getPublished()
+          : await newsService.getAll();
+
+      setPosts(data);
+    } catch (err) {
+      console.error("Error al cargar las novedades:", err);
+      setError("No se pudieron cargar las novedades.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadPosts(mode);
+  }, [mode]);
+
+  const createPost = async (postData: Omit<Post, "post_id">) => {
+    try {
+      const newPost = await newsService.create(postData);
       setPosts((prevPosts) => [newPost, ...prevPosts]);
-      return true; // Retornamos true para avisarle a la vista que todo salió bien
-    } catch (error) {
-      console.error("Error al crear la novedad:", error);
+      return newPost;
+    } catch (err) {
+      console.error("Error al crear la novedad:", err);
+      setError("No se pudo crear la novedad.");
+      return null;
+    }
+  };
+
+  const updatePost = async (id: string | number, patch: Partial<Post>) => {
+    try {
+      const updatedPost = await newsService.update(id, patch);
+      if (!updatedPost) return null;
+
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.post_id.toString() === id.toString() ? updatedPost : post,
+        ),
+      );
+
+      return updatedPost;
+    } catch (err) {
+      console.error("Error al actualizar la novedad:", err);
+      setError("No se pudo actualizar la novedad.");
+      return null;
+    }
+  };
+
+  const deletePost = async (id: string | number) => {
+    try {
+      const success = await newsService.delete(id);
+      if (!success) return false;
+
+      setPosts((prevPosts) =>
+        prevPosts.filter((post) => post.post_id.toString() !== id.toString()),
+      );
+
+      return true;
+    } catch (err) {
+      console.error("Error al eliminar la novedad:", err);
+      setError("No se pudo eliminar la novedad.");
       return false;
     }
   };
 
-  // MISIÓN 3: Eliminar la novedad
-  const deletePost = async (id: string) => {
-    try {
-      const success = await newsService.delete(id);
-      if (success) {
-        // Filtramos el arreglo para quitar el post que coincide con el ID
-        setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
-      }
-    } catch (error) {
-      console.error("Error al eliminar la novedad:", error);
-    }
-  };
-
-  // Exponemos hacia afuera solo lo que la vista necesita
   return {
     posts,
     isLoading,
+    error,
+    loadPosts,
     createPost,
+    updatePost,
     deletePost,
   };
 };

@@ -6,10 +6,10 @@ import { NAV_LINKS, NAV_IDS } from "../../constants/navigation";
 import faceaLogo from "../../assets/images/FACEA-logo.png";
 
 export const NavBar = () => {
-  // Estado para el menú móvil
+  // Estado para el menú mobile (abierto/cerrado)
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // NUEVO: Estado para saber qué sección está activa (por defecto arranca en 'inicio')
+  // Estado para saber qué sección está activa (por defecto arranca en 'inicio')
   const activeSection = useActiveSection(NAV_IDS);
 
   // NUEVO: Bloqueo de scroll a prueba de balas (HTML y BODY)
