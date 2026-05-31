@@ -18,7 +18,7 @@ export const PostCard = ({ post, isLarge = false }: PostCardProps) => {
       <img
         src={imageUrl}
         alt={post.title}
-        loading="lazy" // <- ¡Aquí está la mejora de rendimiento!
+        loading="lazy"
         className="absolute inset-0 h-full w-full object-cover opacity-70 transition-transform duration-700 group-hover:scale-105"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
