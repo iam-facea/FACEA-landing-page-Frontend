@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { newsService, type Post } from "../services/newsService";
+import {
+  newsService,
+  type CreatePostInput,
+  type Post,
+  type UpdatePostInput,
+} from "../services/newsService";
 
 type NewsMode = "published" | "all";
 
@@ -31,10 +36,10 @@ export const useNews = (mode: NewsMode = "published") => {
     void loadPosts(mode);
   }, [mode]);
 
-  const createPost = async (postData: Omit<Post, "post_id">) => {
+  const createPost = async (postData: CreatePostInput) => {
     try {
       const newPost = await newsService.create(postData);
-      setPosts((prevPosts) => [newPost, ...prevPosts]);
+      await loadPosts(mode);
       return newPost;
     } catch (err) {
       console.error("Error al crear la novedad:", err);
@@ -43,16 +48,12 @@ export const useNews = (mode: NewsMode = "published") => {
     }
   };
 
-  const updatePost = async (id: string | number, patch: Partial<Post>) => {
+  const updatePost = async (id: string | number, patch: UpdatePostInput) => {
     try {
       const updatedPost = await newsService.update(id, patch);
       if (!updatedPost) return null;
 
-      setPosts((prevPosts) =>
-        prevPosts.map((post) =>
-          post.post_id.toString() === id.toString() ? updatedPost : post,
-        ),
-      );
+      await loadPosts(mode);
 
       return updatedPost;
     } catch (err) {
@@ -62,14 +63,27 @@ export const useNews = (mode: NewsMode = "published") => {
     }
   };
 
+  const updatePostState = async (id: string | number, postStateId: number) => {
+    try {
+      const updatedPost = await newsService.updateState(id, postStateId);
+      if (!updatedPost) return null;
+
+      await loadPosts(mode);
+
+      return updatedPost;
+    } catch (err) {
+      console.error("Error al cambiar el estado de la novedad:", err);
+      setError("No se pudo cambiar el estado de la novedad.");
+      return null;
+    }
+  };
+
   const deletePost = async (id: string | number) => {
     try {
       const success = await newsService.delete(id);
       if (!success) return false;
 
-      setPosts((prevPosts) =>
-        prevPosts.filter((post) => post.post_id.toString() !== id.toString()),
-      );
+      await loadPosts(mode);
 
       return true;
     } catch (err) {
@@ -86,6 +100,7 @@ export const useNews = (mode: NewsMode = "published") => {
     loadPosts,
     createPost,
     updatePost,
+    updatePostState,
     deletePost,
   };
 };
