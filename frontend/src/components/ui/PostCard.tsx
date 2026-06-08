@@ -11,6 +11,7 @@ export const PostCard = ({ post, isLarge = false }: PostCardProps) => {
   // Ya no necesitamos validaciones complejas. Usamos directamente post.image
   const imageUrl =
     post.image ||
+    post.imageUrl ||
     "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1000&auto=format&fit=crop";
 
   return (
