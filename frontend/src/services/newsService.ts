@@ -1,97 +1,175 @@
-import newsSeed from "../../data/news/newsData.json";
+import { apiRequest } from "./apiClient";
 
-export interface Post {
-  post_id: number | string;
+type ApiPostState = "Público" | "Privado" | "Borrador" | string;
+
+interface ApiPost {
+  id: number;
   title: string;
   description: string;
   category: string;
-  date: string; // YYYY-MM-DD
-  image?: string | null;
-  url?: string | null;
-  post_state_id: string; // 'publico' | 'oculta' | etc.
+  date: string;
+  views?: number;
+  imageUrl?: string | null;
+  state?: ApiPostState;
 }
 
-const STORAGE_KEY = "news:mock";
+export interface Post {
+  post_id: number;
+  title: string;
+  description: string;
+  category: string;
+  date: string;
+  image?: string | null;
+  imageUrl?: string | null;
+  url?: string | null;
+  post_state_id: number;
+  state?: ApiPostState;
+  views?: number;
+}
 
-const readStorage = (): Post[] => {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw) as Post[];
-  } catch (e) {
-    // ignore
+export interface CreatePostInput {
+  title: string;
+  description: string;
+  category: string;
+  date: string;
+  url?: string;
+  postStateId: number;
+  file: File;
+}
+
+export interface UpdatePostInput {
+  title: string;
+  description: string;
+  category: string;
+  date: string;
+  url?: string;
+  postStateId: number;
+  file?: File | null;
+}
+
+const POSTS_PATH = "/api/Posts";
+
+const mapStateToId = (state?: ApiPostState) => {
+  const normalizedState = state?.trim().toLowerCase();
+
+  if (normalizedState === "público" || normalizedState === "public") {
+    return 1;
   }
 
-  // fallback: seed file
-  const seed = (newsSeed as any).posts as Post[];
-  return seed ? JSON.parse(JSON.stringify(seed)) : [];
-};
-
-const writeStorage = (data: Post[]) => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch (e) {
-    // ignore
+  if (normalizedState === "privado" || normalizedState === "private") {
+    return 2;
   }
+
+  return 0;
 };
 
-// Helpers para testing/reset
-export const seedMock = (data: Post[]) => {
-  writeStorage(JSON.parse(JSON.stringify(data)));
+const toPost = (post: ApiPost): Post => ({
+  post_id: post.id,
+  title: post.title,
+  description: post.description,
+  category: post.category,
+  date: post.date,
+  image: post.imageUrl ?? null,
+  imageUrl: post.imageUrl ?? null,
+  url: null,
+  post_state_id: mapStateToId(post.state),
+  state: post.state,
+  views: post.views,
+});
+
+const buildFormData = (data: CreatePostInput | UpdatePostInput) => {
+  const formData = new FormData();
+  formData.append("Title", data.title);
+  formData.append("Description", data.description);
+  formData.append("Category", data.category);
+  formData.append("PostStateId", String(data.postStateId));
+  formData.append("Date", data.date);
+
+  if (data.url) {
+    formData.append("Url", data.url);
+  }
+
+  if (data.file) {
+    formData.append("File", data.file);
+  }
+
+  return formData;
 };
 
-export const resetMock = () => {
-  const seed = (newsSeed as any).posts as Post[];
-  writeStorage(JSON.parse(JSON.stringify(seed)));
+const requestPosts = async (path: string) => {
+  const posts = await apiRequest<ApiPost[]>(path);
+  return posts.map(toPost);
 };
 
-// Servicio principal
 export const newsService = {
-  // Consumo público: solo posts con estado 'publico'
-  getPublished: async (): Promise<Post[]> => {
-    const db = readStorage();
-    return db.filter((p) => p.post_state_id === "publico");
-  },
+  getPublished: async (): Promise<Post[]> => requestPosts(`${POSTS_PATH}/public`),
 
-  // Consumo admin: todas o filtradas por estado
-  getAll: async (filter?: { status?: string }): Promise<Post[]> => {
-    const db = readStorage();
-    if (!filter || !filter.status) return db;
-    return db.filter((p) => p.post_state_id === filter.status);
-  },
+  getAll: async (): Promise<Post[]> => requestPosts(POSTS_PATH),
 
   getById: async (id: string | number): Promise<Post | null> => {
-    const db = readStorage();
-    const found = db.find((p) => p.post_id.toString() === id.toString());
-    return found ? { ...found } : null;
+    try {
+      const post = await apiRequest<ApiPost>(`${POSTS_PATH}/${id}`);
+      return toPost(post);
+    } catch (error) {
+      if (error instanceof Error && "status" in error && (error as { status: number }).status === 404) {
+        return null;
+      }
+
+      throw error;
+    }
   },
 
-  create: async (postData: Omit<Post, "post_id">): Promise<Post> => {
-    const db = readStorage();
-    const maxId = db.reduce((acc, cur) => {
-      const n = typeof cur.post_id === "number" ? cur.post_id : parseInt(String(cur.post_id), 10) || 0;
-      return Math.max(acc, n);
-    }, 0);
-    const newPost: Post = { post_id: maxId + 1, ...postData };
-    const next = [...db, newPost];
-    writeStorage(next);
-    return { ...newPost };
+  create: async (postData: CreatePostInput): Promise<Post> => {
+    const createdPost = await apiRequest<ApiPost>(POSTS_PATH, {
+      method: "POST",
+      body: buildFormData(postData),
+    });
+
+    return toPost(createdPost);
   },
 
-  update: async (id: string | number, patch: Partial<Post>): Promise<Post | null> => {
-    const db = readStorage();
-    const idx = db.findIndex((p) => p.post_id.toString() === id.toString());
-    if (idx === -1) return null;
-    db[idx] = { ...db[idx], ...patch } as Post;
-    writeStorage(db);
-    return { ...db[idx] };
+  update: async (id: string | number, postData: UpdatePostInput): Promise<Post | null> => {
+    try {
+      const updatedPost = await apiRequest<ApiPost>(`${POSTS_PATH}/${id}`, {
+        method: "PUT",
+        body: buildFormData(postData),
+      });
+
+      return toPost(updatedPost);
+    } catch (error) {
+      if (error instanceof Error && "status" in error && (error as { status: number }).status === 404) {
+        return null;
+      }
+
+      throw error;
+    }
+  },
+
+  updateState: async (id: string | number, postStateId: number): Promise<Post | null> => {
+    try {
+      const updatedPost = await apiRequest<ApiPost>(`${POSTS_PATH}/${id}/state`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ postStateId }),
+      });
+
+      return toPost(updatedPost);
+    } catch (error) {
+      if (error instanceof Error && "status" in error && (error as { status: number }).status === 404) {
+        return null;
+      }
+
+      throw error;
+    }
   },
 
   delete: async (id: string | number): Promise<boolean> => {
-    const db = readStorage();
-    const idx = db.findIndex((p) => p.post_id.toString() === id.toString());
-    if (idx === -1) return false;
-    db.splice(idx, 1);
-    writeStorage(db);
+    await apiRequest<void>(`${POSTS_PATH}/${id}`, {
+      method: "DELETE",
+    });
+
     return true;
   },
 };
