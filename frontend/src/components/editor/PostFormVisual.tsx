@@ -7,16 +7,25 @@ export type FormState = {
   category: string;
   date: string;
   image: string;
-  postState: string;
+  postState: "publico" | "oculta";
+  file: File | null;
 };
 
 interface Props {
   form?: FormState;
   onChange?: (next: FormState) => void;
   onClear?: () => void;
+  onSubmit?: (state: FormState) => void | Promise<void>;
+  submitLabel?: string;
 }
 
-export const PostFormVisual: React.FC<Props> = ({ form, onChange, onClear }) => {
+export const PostFormVisual: React.FC<Props> = ({
+  form,
+  onChange,
+  onClear,
+  onSubmit,
+  submitLabel = "Publicar",
+}) => {
   const [local, setLocal] = useState<FormState>(
     form ?? {
       title: "",
@@ -25,7 +34,8 @@ export const PostFormVisual: React.FC<Props> = ({ form, onChange, onClear }) => 
       date: "",
       image: "",
       postState: "publico",
-    }
+      file: null,
+    },
   );
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -48,6 +58,7 @@ export const PostFormVisual: React.FC<Props> = ({ form, onChange, onClear }) => 
       date: "",
       image: "",
       postState: "publico",
+      file: null,
     };
     if (controlled && onChange) onChange(cleared);
     else setLocal(cleared);
@@ -74,15 +85,19 @@ export const PostFormVisual: React.FC<Props> = ({ form, onChange, onClear }) => 
   };
 
   const handleFileSelect = (file: File) => {
-    // Almacenamos el nombre del archivo o creamos una URL local para visualización
-    // En un caso real, aquí podrías subir el archivo a tu servidor
-    update({ image: file.name });
+    update({ image: URL.createObjectURL(file), file });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (onSubmit) {
+      await onSubmit(state);
+    }
   };
 
   return (
     <section className="bg-white rounded-xl shadow-[0px_10px_40px_rgba(13,21,59,0.04)] p-8 mb-16 max-w-4xl mx-auto font-sans">
-      <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
-        
+      <form className="space-y-8" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Categoría */}
           <div className="space-y-2">
@@ -136,7 +151,9 @@ export const PostFormVisual: React.FC<Props> = ({ form, onChange, onClear }) => 
             </label>
             <select
               value={state.postState}
-              onChange={(e) => update({ postState: e.target.value })}
+              onChange={(e) =>
+                update({ postState: e.target.value as FormState["postState"] })
+              }
               className="w-full bg-[#f3f3f5] border-none outline-none rounded-lg py-4 px-4 text-[#1a1c1d] focus:ring-2 focus:ring-[#0d153b] transition-all appearance-none cursor-pointer"
             >
               <option value="publico">Público</option>
@@ -178,14 +195,18 @@ export const PostFormVisual: React.FC<Props> = ({ form, onChange, onClear }) => 
             <input
               type="file"
               ref={fileInputRef}
-              onChange={(e) => e.target.files && handleFileSelect(e.target.files[0])}
+              onChange={(e) =>
+                e.target.files && handleFileSelect(e.target.files[0])
+              }
               className="hidden"
               accept="image/*"
             />
             <span className="material-symbols-outlined text-4xl text-[#c7c5cf] group-hover:text-[#0d153b] transition-colors mb-3">
               cloud_upload
             </span>
-            <p className="text-[#1a1c1d] font-medium">Arrastra y suelta la imagen aquí</p>
+            <p className="text-[#1a1c1d] font-medium">
+              Arrastra y suelta la imagen aquí
+            </p>
             <p className="text-[#46464e] text-sm my-2">o</p>
             <button
               type="button"
@@ -205,20 +226,20 @@ export const PostFormVisual: React.FC<Props> = ({ form, onChange, onClear }) => 
 
         {/* Botones de Acción */}
         <div className="flex justify-end items-center gap-4 pt-4 border-t border-[#eeeef0]">
-          <Button 
-            type="button" 
-            variant="secondary" 
+          <Button
+            type="button"
+            variant="secondary"
             onClick={handleClear}
             className="px-8"
           >
             Limpiar
           </Button>
-          
+
           <button
-            type="button"
+            type="submit"
             className="px-10 py-3 rounded-full bg-[#bd222f] text-white font-bold hover:scale-105 shadow-lg shadow-[#bd222f]/20 transition-all active:scale-95"
           >
-            Publicar
+            {submitLabel}
           </button>
         </div>
       </form>
