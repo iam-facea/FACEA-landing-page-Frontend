@@ -38,15 +38,28 @@ export async function apiRequest<T>(
 
     try {
       const body = await response.json();
+      
+      // 1. Intentamos leer el formato clásico
       if (typeof body?.message === "string") {
         message = body.message;
+      } 
+      // 2. MAGIA PARA .NET: Leemos los errores de validación (400 Bad Request)
+      else if (body?.errors && typeof body.errors === 'object') {
+        const errorMessages = Object.entries(body.errors)
+          .map(([field, errors]) => `${field}: ${(errors as string[]).join(', ')}`)
+          .join(' | ');
+        message = `Error de Validación Backend -> ${errorMessages}`;
+      } 
+      // 3. Fallback genérico de .NET
+      else if (typeof body?.title === "string") {
+        message = body.title;
       }
     } catch {
       try {
         const text = await response.text();
         if (text.trim()) message = text;
       } catch {
-        // Keep the fallback message.
+        // Mantenemos el fallback
       }
     }
 
