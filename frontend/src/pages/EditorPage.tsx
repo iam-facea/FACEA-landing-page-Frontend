@@ -47,7 +47,7 @@ export const EditorPage = () => {
       title: post.title,
       description: post.description,
       category: post.category,
-      date: post.date,
+      date: post.date.split("T")[0],
       image: post.image ?? post.imageUrl ?? "",
       postState: post.post_state_id === 1 ? "publico" : "oculta",
       file: null,
