@@ -90,7 +90,7 @@ const buildFormData = (data: CreatePostInput | UpdatePostInput) => {
   }
 
   if (data.file) {
-    formData.append("Image", data.file);
+    formData.append("File", data.file);
   }
 
   return formData;
