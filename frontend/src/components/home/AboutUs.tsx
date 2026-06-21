@@ -10,21 +10,18 @@ import musicaImage from "../../assets/images/Musica.jpg"; // Ajusta el nombre
 const valores = [
   {
     id: "origen",
-    icono: "history_edu",
     titulo: "El Origen",
     texto:
       "Nacimos en la Universidad Adventista del Plata como una iniciativa de estudiantes comprometidos con la misión.",
   },
   {
     id: "valores",
-    icono: "church",
     titulo: "Valores Cristianos",
     texto:
       "Desde el primer día, nuestra brújula ha sido el servicio abnegado y la vivencia práctica del evangelio.",
   },
   {
     id: "crecimiento",
-    icono: "diversity_3",
     titulo: "Crecimiento",
     texto:
       "Lo que comenzó como un pequeño círculo de oración se transformó en un pilar fundamental de la vida universitaria.",
@@ -55,12 +52,6 @@ export const AboutUs = () => {
         <div className="mb-24 grid gap-8 md:grid-cols-3">
           {valores.map((valor) => (
             <Card key={valor.id} hoverEffect={true} padding="lg">
-              <span
-                className="material-symbols-outlined mb-4 text-[#bd222f]"
-                style={{ fontSize: 40 }}
-              >
-                {valor.icono}
-              </span>
               <h3 className="mb-3 text-xl font-bold text-[#0d153b]">
                 {valor.titulo}
               </h3>
