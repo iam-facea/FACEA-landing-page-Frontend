@@ -41,7 +41,7 @@ export const PostCard = ({ post, isLarge = false }: PostCardProps) => {
       <div className={`relative z-10 ${isLarge ? "p-8 md:p-10" : "p-6"}`}>
         {/* Usamos post.date */}
         <span className="text-sm font-medium text-white/70 mb-2 block">
-          {post.date}
+          {post.date.split("T")[0]} {/* Solo mostramos la fecha sin la hora */}
         </span>
 
         {/* Usamos post.title */}
