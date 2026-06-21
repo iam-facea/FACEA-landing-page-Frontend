@@ -23,7 +23,7 @@ export const EditorPage = () => {
     description: "",
     category: "Noticias",
     date: "",
-    image: "/images/001-Comicion FACEA.png",
+    image: "",
     postState: "publico",
     file: null,
   });
@@ -35,7 +35,7 @@ export const EditorPage = () => {
       description: "",
       category: "Noticias",
       date: "",
-      image: "/images/001-Comicion FACEA.png",
+      image: "",
       postState: "publico",
       file: null,
     });
