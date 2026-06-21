@@ -72,6 +72,9 @@ export const EditorPage = () => {
     }
 
     if (!nextForm.file) {
+      alert(
+        "¡Atención! Debes seleccionar una imagen destacada antes de publicar.",
+      );
       return;
     }
 
