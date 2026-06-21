@@ -215,10 +215,10 @@ export const PostFormVisual: React.FC<Props> = ({
               Explorar archivos
             </button>
             {/* Indicador de archivo seleccionado */}
-            {state.image && (
+            {state.image && state.file && (
               <div className="mt-4 px-4 py-2 bg-[#e0e1f7] text-[#0d153b] rounded-lg text-sm font-semibold flex items-center gap-2">
                 <span className="material-symbols-outlined text-sm">image</span>
-                {state.image}
+                {state.file.name}
               </div>
             )}
           </div>
