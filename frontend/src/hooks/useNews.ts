@@ -93,6 +93,24 @@ export const useNews = (mode: NewsMode = "published") => {
     }
   };
 
+  const getPostById = async (id: string | number) => {
+    try {
+      return await newsService.getById(id);
+    } catch (err) {
+      console.error("Error al obtener la novedad por ID:", err);
+      return null;
+    }
+  };
+  
+  const incrementViews = async (id: string | number) => {
+    try {
+      return await newsService.incrementViews(id);
+    } catch (err) {
+      console.error("Error al incrementar la vista de la novedad:", err);
+      return null;
+    }
+  };
+
   return {
     posts,
     isLoading,
@@ -102,5 +120,7 @@ export const useNews = (mode: NewsMode = "published") => {
     updatePost,
     updatePostState,
     deletePost,
+    getPostById,
+    incrementViews,
   };
 };
