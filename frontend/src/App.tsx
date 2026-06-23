@@ -1,7 +1,7 @@
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import { LoginPage } from "./pages/LoginPage";
+import { PostDetailsPage } from "./pages/PostDetailPage";
 import { NavBar } from "./components/layout/NavBar";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { EditorPage } from "./pages/EditorPage";
@@ -25,6 +25,9 @@ function App() {
         {/* Ruta de Login */}
         <Route path="/login" element={<LoginPage />} />
 
+        {/* Ruta Pública: Detalle de Post */}
+        <Route path="/novedades/:id" element={<PostDetailsPage />} />
+
         {/* Ruta Protegida: Editor */}
         <Route
           path="/editor"
@@ -40,7 +43,6 @@ function App() {
       </Routes>
     </BrowserRouter>
   );
-
 }
 
 export default App;
