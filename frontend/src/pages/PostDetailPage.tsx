@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { newsService, type Post } from "../services/newsService";
+import { useNews } from "../hooks/useNews";
+import type { Post } from "../services/newsService";
 import faceaLogo from "../assets/images/FACEA-logo.png";
 
 export const PostDetailsPage = () => {
@@ -8,14 +9,13 @@ export const PostDetailsPage = () => {
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const { getPostById, incrementViews } = useNews();
+
   useEffect(() => {
     // Al llamar a getById, el backend en .NET sumará automáticamente post.Views++
     if (id) {
-      newsService
-        .incrementViews(id) // Llamada para incrementar las vistas
-        .then(() => {
-          return newsService.getById(id); // Luego obtenemos los detalles (GET) del post
-        })
+      incrementViews(id) // Llamada para incrementar las vistas
+        .then(() => getPostById(id)) // Luego obtenemos los detalles (GET) del post
         .then((data) => setPost(data))
         .catch((err) => console.error(err))
         .finally(() => setIsLoading(false));
