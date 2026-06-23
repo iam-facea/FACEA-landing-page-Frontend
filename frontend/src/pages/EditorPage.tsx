@@ -1,11 +1,13 @@
+import { useState } from "react";
 import { EditorNavBar } from "../components/layout/EditorNavBar";
 import { useNews } from "../hooks/useNews";
 import PostFormVisual from "../components/editor/PostFormVisual";
 import type { FormState } from "../components/editor/PostFormVisual";
 import PostCardsEditor from "../components/editor/PostCardsEditor";
-import { useState } from "react";
 import { PostCard } from "../components/ui/PostCard";
 import type { Post as ServicePost } from "../services/newsService";
+import { Container } from "../components/ui/Container";
+import { Card } from "../components/ui/Card";
 
 export const EditorPage = () => {
   const {
@@ -18,6 +20,7 @@ export const EditorPage = () => {
     deletePost,
   } = useNews("all");
   const [selectedPost, setSelectedPost] = useState<ServicePost | null>(null);
+
   const [form, setForm] = useState<FormState>({
     title: "",
     description: "",
@@ -78,10 +81,7 @@ export const EditorPage = () => {
       return;
     }
 
-    await createPost({
-      ...payload,
-      file: nextForm.file,
-    });
+    await createPost({ ...payload, file: nextForm.file });
     handleClear();
   };
 
@@ -91,115 +91,104 @@ export const EditorPage = () => {
 
   const handleDeletePost = async (post: ServicePost) => {
     await deletePost(post.post_id);
-
-    if (selectedPost?.post_id === post.post_id) {
-      handleClear();
-    }
+    if (selectedPost?.post_id === post.post_id) handleClear();
   };
 
   return (
     <div className="min-h-screen bg-[#f9f9fb]">
       <EditorNavBar />
 
-      <main className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 py-10 lg:px-8">
-        <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#bd222f]">
-            Editor de publicaciones
-          </p>
-          <h1 className="mt-3 text-3xl font-bold text-[#0d153b]">
-            Gestión de noticias FACEA
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
-            Esta pantalla ya trabaja con la API real de posts y permite crear,
-            editar, ocultar y eliminar publicaciones.
-          </p>
-        </section>
+      {/* Usamos el componente genérico Container */}
+      <Container className="py-10">
+        <div className="flex flex-col gap-8">
+          {/* Usamos tu UI Kit Card en lugar de un section con estilos sueltos */}
+          <Card padding="lg">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#bd222f]">
+              Panel de Administración
+            </p>
+            <h1 className="mt-3 text-3xl font-bold text-[#0d153b]">
+              Gestión de noticias FACEA
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
+              Crea, edita o elimina publicaciones. Todo cambio aquí se reflejará
+              instantáneamente en la Landing Page.
+            </p>
+          </Card>
 
-        {error && (
-          <section className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
-          </section>
-        )}
-
-        <section className="space-y-5">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-bold text-[#0d153b]">
-                Publicaciones cargadas
-              </h2>
-              <p className="text-sm text-slate-600">
-                Se están mostrando los posts reales que administra `useNews`.
-              </p>
+          {error && (
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
             </div>
+          )}
 
-            <div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm">
-              {posts.length} publicaciones
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <div>
-              <PostFormVisual
-                form={form}
-                onChange={setForm}
-                onClear={handleClear}
-                onSubmit={handleSubmit}
-                submitLabel={selectedPost ? "Actualizar" : "Publicar"}
-              />
-            </div>
-
-            <div className="pt-4">
-              <h3 className="text-lg font-semibold text-slate-700">
-                Previsualización
-              </h3>
-              <p className="text-sm text-slate-500">
-                Separada para enfocarse en el contenido antes de publicarla.
-              </p>
-
-              <div className="mt-4 max-w-2xl">
-                <PostCard
-                  post={
-                    {
-                      post_id: 0,
-                      title: form.title || "Título de ejemplo",
-                      description:
-                        form.description || "Entradilla o descripción corta...",
-                      category: form.category,
-                      date: form.date || new Date().toISOString().split("T")[0],
-                      image: form.image,
-                      imageUrl: form.image,
-                      post_state_id: form.postState === "publico" ? 1 : 2,
-                      state:
-                        form.postState === "publico" ? "Público" : "Oculto",
-                      views: 0,
-                    } as unknown as ServicePost
+          <div className="space-y-12">
+            {/* ZONA DE REDACCIÓN Y PREVISUALIZACIÓN */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* Formulario (Toma 7 columnas) */}
+              <div className="lg:col-span-7">
+                <PostFormVisual
+                  form={form}
+                  onChange={setForm}
+                  onClear={handleClear}
+                  onSubmit={handleSubmit}
+                  submitLabel={
+                    selectedPost ? "Actualizar Noticia" : "Publicar Noticia"
                   }
-                  isLarge
                 />
+              </div>
+
+              {/* Previsualización (Toma 5 columnas) */}
+              <div className="lg:col-span-5">
+                <div className="sticky top-24">
+                  <h3 className="text-lg font-semibold text-[#0d153b] mb-4">
+                    Previsualización
+                  </h3>
+
+                  {/* Contenedor que evita el "achatamiento" simulando el ancho del carrusel */}
+                  <div className="h-[450px] w-full rounded-3xl shadow-lg ring-1 ring-slate-200">
+                    <PostCard
+                      post={
+                        {
+                          post_id: 0,
+                          title: form.title || "Escribe un título atractivo...",
+                          description:
+                            form.description ||
+                            "La descripción corta de tu noticia aparecerá aquí.",
+                          category: form.category,
+                          date:
+                            form.date || new Date().toISOString().split("T")[0],
+                          image: form.image,
+                          imageUrl: form.image,
+                          post_state_id: form.postState === "publico" ? 1 : 2,
+                          state:
+                            form.postState === "publico" ? "Público" : "Oculto",
+                          views: 0,
+                        } as unknown as ServicePost
+                      }
+                      isLarge={true}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div>
-              <div className="mb-4 flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold text-[#0d153b]">
-                    Publicaciones cargadas
-                  </h2>
-                  <p className="text-sm text-slate-600">
-                    Se están mostrando los posts reales que administra
-                    `useNews`.
-                  </p>
-                </div>
-
-                <div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm">
-                  {posts.length} publicaciones
+            {/* ZONA DE LISTADO DE POSTS */}
+            <div className="pt-8 border-t border-slate-200">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-[#0d153b]">
+                  Publicaciones Guardadas
+                </h2>
+                <div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-[#bd222f] shadow-sm">
+                  {posts.length} Totales
                 </div>
               </div>
 
               {isLoading ? (
-                <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">
-                  Cargando publicaciones...
-                </div>
+                <Card className="p-16 text-center text-slate-500 border-dashed border-2">
+                  <span className="animate-pulse">
+                    Cargando la base de datos...
+                  </span>
+                </Card>
               ) : (
                 <PostCardsEditor
                   posts={posts}
@@ -210,8 +199,8 @@ export const EditorPage = () => {
               )}
             </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </Container>
     </div>
   );
 };
