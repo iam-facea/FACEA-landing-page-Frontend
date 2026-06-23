@@ -201,9 +201,19 @@ export const PostFormVisual: React.FC<Props> = ({
               className="hidden"
               accept="image/*"
             />
-            <span className="material-symbols-outlined text-4xl text-[#c7c5cf] group-hover:text-[#0d153b] transition-colors mb-3">
-              cloud_upload
-            </span>
+            <svg
+              className="w-14 h-14 text-[#c7c5cf] group-hover:text-[#0d153b] transition-colors mb-3"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+              />
+            </svg>
             <p className="text-[#1a1c1d] font-medium">
               Arrastra y suelta la imagen aquí
             </p>
