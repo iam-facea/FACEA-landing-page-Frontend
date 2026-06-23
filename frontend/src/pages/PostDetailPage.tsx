@@ -8,10 +8,13 @@ export const PostDetailsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Al llamar a getById, tu backend en .NET sumará automáticamente post.Views++
+    // Al llamar a getById, el backend en .NET sumará automáticamente post.Views++
     if (id) {
       newsService
-        .getById(id)
+        .incrementViews(id) // Llamada para incrementar las vistas
+        .then(() => {
+          return newsService.getById(id); // Luego obtenemos los detalles (GET) del post
+        })
         .then((data) => setPost(data))
         .catch((err) => console.error(err))
         .finally(() => setIsLoading(false));
