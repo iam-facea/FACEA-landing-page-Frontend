@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { newsService, type Post } from "../services/newsService";
+import faceaLogo from "../assets/images/FACEA-logo.png";
 
 export const PostDetailsPage = () => {
   const { id } = useParams();
@@ -67,8 +68,15 @@ export const PostDetailsPage = () => {
               alt={post.title}
               className="w-full h-full object-cover"
             />
-            <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full text-xs font-bold text-[#bd222f] uppercase tracking-widest shadow-lg">
-              {post.category}
+            <div className="absolute top-5 right-5 z-20 flex items-center gap-2 rounded-full bg-white/20 px-3 py-1.5 backdrop-blur-md border border-white/10">
+              <img
+                src={faceaLogo}
+                alt="FACEA"
+                className="h-6 w-auto object-contain drop-shadow-md"
+              />
+              <span className="text-xs font-bold tracking-wider text-white uppercase shadow-sm mt-[1px]">
+                {post.category}
+              </span>
             </div>
           </div>
 

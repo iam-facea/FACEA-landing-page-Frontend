@@ -8,7 +8,6 @@ interface PostCardProps {
 }
 
 export const PostCard = ({ post, isLarge = false }: PostCardProps) => {
-  // Ya no necesitamos validaciones complejas. Usamos directamente post.image
   const imageUrl =
     post.image ||
     post.imageUrl ||
