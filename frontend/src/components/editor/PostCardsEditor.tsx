@@ -1,65 +1,76 @@
-import React from "react";
-import type { Post } from "../../services/newsService";
+import type { Post as ServicePost } from "../../services/newsService";
 import { PostCard } from "../ui/PostCard";
+import { Button } from "../ui/Button";
 
 interface Props {
-  posts: Post[];
-  onEdit?: (post: Post) => void;
-  onToggleState?: (post: Post) => void;
-  onDelete?: (post: Post) => void;
+  posts: ServicePost[];
+  onEdit: (post: ServicePost) => void;
+  onToggleState: (post: ServicePost) => void;
+  onDelete: (post: ServicePost) => void;
 }
 
-export const PostCardsEditor: React.FC<Props> = ({
+export const PostCardsEditor = ({
   posts,
   onEdit,
   onToggleState,
   onDelete,
-}) => {
+}: Props) => {
   return (
-    <section className="rounded-2xl bg-white p-6 shadow-sm">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-lg font-bold text-[#0d153b]">
-          Listado de publicaciones
-        </h3>
-        <span className="text-sm text-slate-600">Acciones visuales</span>
-      </div>
+    // GRID de 2 columnas para escritorio, 1 para celular
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {posts.map((post) => (
+        <div
+          key={post.post_id}
+          className="flex flex-col bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm transition-shadow hover:shadow-md"
+        >
+          {/* Le damos una altura fija (h-72) para que PostCard se vea proporcionado y no achatado */}
+          <div className="h-72 relative w-full">
+            <PostCard post={post} />
 
-      <div className="flex flex-col gap-6">
-        {posts.map((post) => (
-          <div key={post.post_id} className="w-full">
-            <div className="mb-3">
-              <PostCard post={post} isLarge />
-            </div>
+            {/* Etiqueta flotante para saber si está oculto a simple vista */}
+            {post.post_state_id !== 1 && (
+              <div className="absolute top-4 left-4 z-30 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
+                Oculto
+              </div>
+            )}
+          </div>
 
-            <div className="flex items-center justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => onEdit?.(post)}
-                className="rounded-md bg-[#e8e8ea] text-[#0d153b] px-4 py-2 text-sm border border-transparent hover:bg-[#e2e2e4]"
+          {/* Botonera de acciones (Reutilizando tu UI de Button) */}
+          <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => onEdit(post)}
               >
                 Editar
-              </button>
-
-              <button
-                type="button"
-                onClick={() => onToggleState?.(post)}
-                className="rounded-md bg-[#e8e8ea] text-[#0d153b] px-4 py-2 text-sm border border-transparent hover:bg-[#e2e2e4]"
+              </Button>
+              {/* Cambiamos el confuso "Publicar" por Ocultar / Mostrar */}
+              <Button
+                size="sm"
+                variant={post.post_state_id === 1 ? "secondary" : "primary"}
+                onClick={() => onToggleState(post)}
               >
-                {post.post_state_id === 1 ? "Ocultar" : "Publicar"}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => onDelete?.(post)}
-                className="rounded-md bg-white text-red-600 px-4 py-2 text-sm border border-red-100 hover:bg-red-50"
-              >
-                Eliminar
-              </button>
+                {post.post_state_id === 1 ? "Ocultar" : "Mostrar"}
+              </Button>
             </div>
+            <button
+              onClick={() => {
+                if (
+                  window.confirm(
+                    `¿Seguro que quieres eliminar "${post.title}"?`,
+                  )
+                )
+                  onDelete(post);
+              }}
+              className="text-slate-400 hover:text-red-600 text-sm font-bold px-3 py-2 transition-colors"
+            >
+              Eliminar
+            </button>
           </div>
-        ))}
-      </div>
-    </section>
+        </div>
+      ))}
+    </div>
   );
 };
 
