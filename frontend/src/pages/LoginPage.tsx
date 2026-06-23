@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { authService } from "../services/authService";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
@@ -28,6 +28,13 @@ export const LoginPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f9f9fb] px-4">
+      <Link
+        to="/"
+        className="absolute top-6 left-6 md:top-10 md:left-10 flex items-center gap-2 text-sm font-medium text-[#64748b] transition-colors hover:text-[#bd222f]"
+      >
+        <span>&larr;</span> Volver al inicio
+      </Link>
+
       <Card className="w-full max-w-md p-8">
         <h2 className="text-2xl font-bold text-[#0d153b] mb-6 text-center">
           Admin Login
