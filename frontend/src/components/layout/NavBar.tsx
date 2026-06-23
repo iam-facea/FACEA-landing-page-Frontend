@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "../ui/Button";
 import { useActiveSection } from "../../hooks/useActiveSection";
 import { NAV_LINKS, NAV_IDS } from "../../constants/navigation";
@@ -92,7 +93,13 @@ export const NavBar = () => {
 
         {/* 3. DERECHA: Botón CTA y Menú Hamburguesa */}
         <div className="ml-auto flex items-center z-50">
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center gap-6">
+            <Link
+              to="/login"
+              className="text-sm font-medium text-[#64748b] hover:text-[#0d153b] transition-colors"
+            >
+              Iniciar Sesión
+            </Link>
             <Button variant="primary" size="sm">
               Tienda y Donaciones
             </Button>
@@ -161,7 +168,14 @@ export const NavBar = () => {
             </a>
           ))}
 
-          <div className="mt-4 border-t border-slate-200 pt-6">
+          <div className="mt-4 border-t border-slate-200 pt-6 flex flex-col gap-4">
+            <Link
+              to="/login"
+              className="text-center text-sm font-medium text-[#64748b] hover:text-[#0d153b]"
+            >
+              Acceso Administrador
+            </Link>
+
             <Button variant="primary" fullWidth onClick={toggleMenu}>
               Tienda y Donaciones
             </Button>
