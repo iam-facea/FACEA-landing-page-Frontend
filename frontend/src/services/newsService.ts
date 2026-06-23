@@ -157,6 +157,18 @@ export const newsService = {
 
     return true;
   },
+
+  incrementViews: async (id: string | number): Promise<boolean> => {
+    try {
+      await apiRequest<void>(`${POSTS_PATH}/${id}/view`, {
+        method: "PATCH",
+      });
+      return true;
+    } catch (error) {
+      console.error("Error al incrementar vistas:", error);
+      return false;
+    }
+  }
 };
 
 export default newsService;
