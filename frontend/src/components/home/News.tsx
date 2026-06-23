@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { Container } from "../ui/Container";
 import { PostCard } from "../ui/PostCard";
 import { useNews } from "../../hooks/useNews";
+import { useNavigate } from "react-router-dom";
 
 export const News = () => {
   const { posts, isLoading } = useNews();
+  const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -84,7 +86,8 @@ export const News = () => {
                 onClick={() => {
                   const offset = index - activeIndex;
                   if (offset === 1 || offset === -(total - 1)) next();
-                  if (offset === -1 || offset === total - 1) prev();
+                  else if (offset === -1 || offset === total - 1) prev();
+                  else if (offset === 0) navigate(`/novedades/${post.post_id}`); // <-- MAGIA: Navega al detalle
                 }}
                 className={`absolute left-1/2 top-0 h-[400px] w-[80vw] max-w-[500px] md:h-[500px] transition-all duration-[800ms] ease-[cubic-bezier(0.25,1,0.35,1)] ${positionClasses}`}
               >
