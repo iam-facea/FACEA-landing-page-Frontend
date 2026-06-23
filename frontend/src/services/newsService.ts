@@ -1,7 +1,5 @@
 import { apiRequest } from "./apiClient";
 
-type ApiPostState = "Público" | "Privado" | "Borrador" | string;
-
 interface ApiPost {
   id: number;
   title: string;
@@ -10,7 +8,7 @@ interface ApiPost {
   date: string;
   views?: number;
   imageUrl?: string | null;
-  state?: ApiPostState;
+  postStateId: number; 
 }
 
 export interface Post {
@@ -23,7 +21,7 @@ export interface Post {
   imageUrl?: string | null;
   url?: string | null;
   post_state_id: number;
-  state?: ApiPostState;
+  state?: string;
   views?: number;
 }
 
@@ -49,20 +47,6 @@ export interface UpdatePostInput {
 
 const POSTS_PATH = "/api/Posts";
 
-const mapStateToId = (state?: ApiPostState) => {
-  const normalizedState = state?.trim().toLowerCase();
-
-  if (normalizedState === "público" || normalizedState === "public") {
-    return 1;
-  }
-
-  if (normalizedState === "privado" || normalizedState === "private") {
-    return 2;
-  }
-
-  return 0;
-};
-
 const toPost = (post: ApiPost): Post => ({
   post_id: post.id,
   title: post.title,
@@ -72,8 +56,9 @@ const toPost = (post: ApiPost): Post => ({
   image: post.imageUrl ?? null,
   imageUrl: post.imageUrl ?? null,
   url: null,
-  post_state_id: mapStateToId(post.state),
-  state: post.state,
+  // ¡AQUÍ ESTÁ LA MAGIA! Leemos el número directamente del backend
+  post_state_id: post.postStateId, 
+  state: post.postStateId === 1 ? "Público" : "Oculto",
   views: post.views,
 });
 
