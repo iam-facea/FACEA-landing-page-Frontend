@@ -1,5 +1,7 @@
 # 🔐 Configuración de acceso con SSH (Recomendado)
 
+...GIT TEST
+
 Para trabajar de forma segura y sin tener que ingresar credenciales constantemente, utilizamos **autenticación mediante SSH**.
 
 # ⚙️ Paso a paso: Configuración SSH
