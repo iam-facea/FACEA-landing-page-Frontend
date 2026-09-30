@@ -41,10 +41,11 @@ export const LoginPage = () => {
         </h2>
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-1">
               Usuario
             </label>
             <input
+              id="username"
               type="text"
               className="w-full p-2 border border-slate-300 rounded-lg focus:outline-none focus:border-[#bd222f]"
               value={username}
@@ -53,10 +54,11 @@ export const LoginPage = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
               Contraseña
             </label>
             <input
+              id="password"
               type="password"
               className="w-full p-2 border border-slate-300 rounded-lg focus:outline-none focus:border-[#bd222f]"
               value={password}

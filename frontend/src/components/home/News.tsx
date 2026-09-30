@@ -21,7 +21,7 @@ export const News = () => {
     if (isPaused || total === 0) return;
 
     const timer = setTimeout(() => {
-      next();
+      setActiveIndex((prev) => (total === 0 ? 0 : (prev + 1) % total));
     }, 4000);
 
     return () => clearTimeout(timer);
