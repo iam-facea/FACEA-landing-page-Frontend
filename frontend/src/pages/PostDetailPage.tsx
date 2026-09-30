@@ -20,6 +20,7 @@ export const PostDetailsPage = () => {
         .catch((err) => console.error(err))
         .finally(() => setIsLoading(false));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   if (isLoading) {

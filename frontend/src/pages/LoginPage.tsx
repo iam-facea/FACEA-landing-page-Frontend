@@ -19,8 +19,14 @@ export const LoginPage = () => {
     try {
       const success = await authService.login(username, password);
       if (success) navigate("/editor");
-    } catch (err) {
-      setError(err as string);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else if (typeof err === "string") {
+        setError(err);
+      } else {
+        setError("Ocurrió un error inesperado al iniciar sesión.");
+      }
     } finally {
       setLoading(false);
     }
@@ -41,30 +47,38 @@ export const LoginPage = () => {
         </h2>
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-1">
               Usuario
             </label>
             <input
+              id="username"
               type="text"
-              className="w-full p-2 border border-slate-300 rounded-lg focus:outline-none focus:border-[#bd222f]"
+              className="w-full p-2 border border-slate-300 rounded-lg focus:outline-none focus:border-[#bd222f] disabled:bg-slate-100 disabled:cursor-not-allowed"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              disabled={loading}
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
               Contraseña
             </label>
             <input
+              id="password"
               type="password"
-              className="w-full p-2 border border-slate-300 rounded-lg focus:outline-none focus:border-[#bd222f]"
+              className="w-full p-2 border border-slate-300 rounded-lg focus:outline-none focus:border-[#bd222f] disabled:bg-slate-100 disabled:cursor-not-allowed"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
               required
             />
           </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && (
+            <p role="alert" className="text-red-500 text-sm">
+              {error}
+            </p>
+          )}
           <Button type="submit" fullWidth disabled={loading}>
             {loading ? "Entrando..." : "Iniciar Sesión"}
           </Button>

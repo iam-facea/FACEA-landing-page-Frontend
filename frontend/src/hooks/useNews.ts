@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   newsService,
   type CreatePostInput,
@@ -13,7 +13,7 @@ export const useNews = (mode: NewsMode = "published") => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadPosts = async (nextMode: NewsMode = mode) => {
+  const loadPosts = useCallback(async (nextMode: NewsMode = mode) => {
     setIsLoading(true);
     setError(null);
 
@@ -30,11 +30,11 @@ export const useNews = (mode: NewsMode = "published") => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [mode]);
 
   useEffect(() => {
     void loadPosts(mode);
-  }, [mode]);
+  }, [loadPosts, mode]);
 
   const createPost = async (postData: CreatePostInput) => {
     try {
