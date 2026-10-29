@@ -1,0 +1,14 @@
+{
+  "name": "facea-e2e-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Suite de pruebas End-to-End externas de caja negra para FACEA Landing Page",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.0"
+  }
+}
