@@ -59,6 +59,7 @@ export const PostFormVisual: React.FC<Props> = ({
 
   const handleClear = () => {
     setValidationError(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
     const cleared: FormState = {
       title: "",
       description: "",
@@ -75,7 +76,7 @@ export const PostFormVisual: React.FC<Props> = ({
   };
 
   // --- Validación en cliente de imágenes (Sección 6 del Contrato) ---
-  const validateFile = (file: File): string | null => {
+  const validateFileAsync = async (file: File): Promise<string | null> => {
     const allowed = IMAGE_UPLOAD_CONSTRAINTS.ALLOWED_MIME_TYPES as readonly string[];
     if (!allowed.includes(file.type)) {
       return "Formato no soportado. Se requieren imágenes JPG, PNG o WebP.";
@@ -83,6 +84,26 @@ export const PostFormVisual: React.FC<Props> = ({
     if (file.size > IMAGE_UPLOAD_CONSTRAINTS.MAX_SIZE_BYTES) {
       return "El archivo supera el tamaño máximo permitido de 5 MB.";
     }
+
+    // Validación de dimensiones máximas (máximo 4096 x 4096 px según sección 6 del contrato)
+    try {
+      const dimensions = await new Promise<{ width: number; height: number }>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
+        img.onerror = () => reject(new Error("No se pudo cargar la imagen para validar dimensiones."));
+        img.src = URL.createObjectURL(file);
+      });
+
+      if (
+        dimensions.width > IMAGE_UPLOAD_CONSTRAINTS.MAX_DIMENSION_PX ||
+        dimensions.height > IMAGE_UPLOAD_CONSTRAINTS.MAX_DIMENSION_PX
+      ) {
+        return `Las dimensiones de la imagen (${dimensions.width}x${dimensions.height} px) superan el máximo permitido de ${IMAGE_UPLOAD_CONSTRAINTS.MAX_DIMENSION_PX}x${IMAGE_UPLOAD_CONSTRAINTS.MAX_DIMENSION_PX} px.`;
+      }
+    } catch {
+      // Si el navegador no puede decodificarla, dejamos pasar para que el backend valide
+    }
+
     return null;
   };
 
@@ -96,19 +117,22 @@ export const PostFormVisual: React.FC<Props> = ({
     setIsDragging(false);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     const files = e.dataTransfer.files;
     if (files && files.length > 0) {
-      handleFileSelect(files[0]);
+      await handleFileSelect(files[0]);
     }
   };
 
-  const handleFileSelect = (file: File) => {
-    const errorMsg = validateFile(file);
+  const handleFileSelect = async (file: File) => {
+    const errorMsg = await validateFileAsync(file);
     if (errorMsg) {
       setValidationError(errorMsg);
+      // Limpiamos cualquier selección previa inválida
+      update({ image: "", file: null, imageContentId: undefined });
+      if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
 
