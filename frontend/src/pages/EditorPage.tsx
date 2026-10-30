@@ -36,9 +36,7 @@ export const EditorPage = () => {
     file: null,
   });
 
-  const handleClear = () => {
-    setSelectedPost(null);
-    setFormFeedback(null);
+  const resetFormState = () => {
     setForm({
       title: "",
       description: "",
@@ -49,6 +47,20 @@ export const EditorPage = () => {
       file: null,
       imageContentId: undefined,
     });
+  };
+
+  const handleClear = () => {
+    setSelectedPost(null);
+    setFormFeedback(null);
+    resetFormState();
+  };
+
+  const handleFormChange = (nextForm: FormState) => {
+    setForm(nextForm);
+    // Si el usuario cambia la foto o escribe, limpiamos alertas de error previas
+    if (formFeedback?.type === "error") {
+      setFormFeedback(null);
+    }
   };
 
   const handleEditPost = (post: ServicePost) => {
@@ -86,11 +98,13 @@ export const EditorPage = () => {
 
       if (selectedPost) {
         await updatePost(selectedPost.post_id, payload);
+        setSelectedPost(null);
+        resetFormState();
         setFormFeedback({
           type: "success",
           message: "Publicación actualizada exitosamente.",
         });
-        handleClear();
+        window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }
 
@@ -99,15 +113,18 @@ export const EditorPage = () => {
           type: "error",
           message: "Debes seleccionar una imagen para la publicación.",
         });
+        window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }
 
       await createPost({ ...payload, file: nextForm.file });
+      setSelectedPost(null);
+      resetFormState();
       setFormFeedback({
         type: "success",
         message: "Publicación creada exitosamente.",
       });
-      handleClear();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: unknown) {
       console.error("[EditorPage] Error en handleSubmit:", err);
       const message =
@@ -161,7 +178,8 @@ export const EditorPage = () => {
             </p>
           </Card>
 
-          {apiError && (
+          {/* Solo mostramos apiError si no es un error de publicación ya informado por formFeedback */}
+          {apiError && !formFeedback && (
             <div
               role="alert"
               className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 shadow-sm"
@@ -191,7 +209,7 @@ export const EditorPage = () => {
               <div className="lg:col-span-7">
                 <PostFormVisual
                   form={form}
-                  onChange={setForm}
+                  onChange={handleFormChange}
                   onClear={handleClear}
                   onSubmit={handleSubmit}
                   submitting={submitting}
