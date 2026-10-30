@@ -1,15 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { authService } from "../services/authService";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 
 export const LoginPage = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Si ya tiene sesión activa, redirigir directo al editor
+  useEffect(() => {
+    let isMounted = true;
+    authService.isAuthenticated().then((authenticated) => {
+      if (isMounted && authenticated) {
+        navigate("/editor", { replace: true });
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,7 +30,7 @@ export const LoginPage = () => {
     setError("");
 
     try {
-      const success = await authService.login(username, password);
+      const success = await authService.login(email, password);
       if (success) navigate("/editor");
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -47,15 +60,17 @@ export const LoginPage = () => {
         </h2>
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-1">
-              Usuario
+            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
+              Email / Usuario
             </label>
             <input
-              id="username"
+              id="email"
               type="text"
+              autoComplete="username"
+              placeholder="editor@institucion.edu.ar"
               className="w-full p-2 border border-slate-300 rounded-lg focus:outline-none focus:border-[#bd222f] disabled:bg-slate-100 disabled:cursor-not-allowed"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
               required
             />
@@ -67,6 +82,7 @@ export const LoginPage = () => {
             <input
               id="password"
               type="password"
+              autoComplete="current-password"
               className="w-full p-2 border border-slate-300 rounded-lg focus:outline-none focus:border-[#bd222f] disabled:bg-slate-100 disabled:cursor-not-allowed"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
