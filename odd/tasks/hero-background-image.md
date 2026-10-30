@@ -26,7 +26,8 @@ The current Hero uses the institutional logo, dark text, and a CTA on a plain ba
 - Strategy: `ask-on-risk`.
 - Forecast: under 120 authored changed lines across two cohesive image work units.
 - Branch: `feat/update-images`.
-- Commit: pending explicit user authorization.
+- Work-unit commit: `c44f680d9bec4810f964210f82c4c0225f4ccb1a` (`feat(landing): update hero and sabbath school images`).
+- Native review: approved and acknowledged for the committed range from `develop`.
 
 ## Test mode
 - TDD mode: unknown; no explicit project/session TDD setting was found.
@@ -42,7 +43,7 @@ The current Hero uses the institutional logo, dark text, and a CTA on a plain ba
   - Center the exact requested title and subtitle vertically and horizontally.
   - Remove the existing Hero logo and CTA while leaving all other page areas untouched.
   - Acceptance: the Hero alone matches the requested photographic composition and remains legible on mobile and desktop.
-- [ ] **HERO-02 — Verify scope and build health**
+- [x] **HERO-02 — Verify scope and build health**
   - Route: delegated verification if required by native assessment; parent structural readback otherwise.
   - Run lint and production build.
   - Confirm the final diff changes only the intended image work, relocations, and this ODD tracking document, while preserving the unrelated `.gitignore` change.
@@ -55,15 +56,15 @@ The current Hero uses the institutional logo, dark text, and a CTA on a plain ba
   - Acceptance: the card’s markup, text, classes, overlay, dimensions, proportions, and responsive behavior are byte-for-byte unchanged outside the image import/reference.
 
 ## Progress
-HERO-01 and IMAGE-01 are implemented. Both supplied root images were moved into `frontend/src/assets/images/` without duplication. Independent verification confirmed the Hero composition and that `AboutUs.tsx` changes only the Escuela Sabática import path. HERO-02 remains open because manual desktop/mobile browser inspection and work-unit commit authorization are pending.
+All three tasks are complete. Both supplied root images were moved into `frontend/src/assets/images/` without duplication. The committed candidate passed automated, independent, runtime responsive, and native review checks.
 
 ## Verification evidence
 - Hero writer: `npm run lint` passed; `npm run build` passed.
 - Escuela Sabática writer: `npm run lint` passed; `npm run build` passed; its TSX diff is exactly one import-line replacement.
 - Final independent verifier: `npm run lint` passed; `npm run build` passed; both moved assets resolve; both root sources are absent; no Navbar, Footer, backend, other card, or unrelated source file changed.
-- Native risk assessment: unavailable because untracked files require explicit declaration; independent verification was therefore required and completed.
-- Manual desktop/mobile browser inspection: pending.
-- Work-unit commit: pending explicit user authorization.
+- Runtime verification: headless Chromium passed at `1440x900` and `390x844`; Hero width/height, cover cropping, 60% overlay, exact centered copy, no CTA/logo, Escuela Sabática image loading, responsive card dimensions, and no horizontal overflow were observed.
+- Native review: medium-tier reliability review approved and acknowledged; advisory `R3-responsive-visual-proof` was satisfied by the subsequent responsive Chromium verification.
+- Commit: `c44f680d9bec4810f964210f82c4c0225f4ccb1a`.
 
 ## Next step
-Resolve the native review candidate, then request explicit commit authorization; manual responsive inspection remains a disclosed pending check.
+Push the feature branch or open a pull request only on explicit user request.
