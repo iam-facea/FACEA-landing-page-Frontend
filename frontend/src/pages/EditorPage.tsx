@@ -85,19 +85,12 @@ export const EditorPage = () => {
       };
 
       if (selectedPost) {
-        const updated = await updatePost(selectedPost.post_id, payload);
-        if (updated) {
-          setFormFeedback({
-            type: "success",
-            message: "Publicación actualizada exitosamente.",
-          });
-          handleClear();
-        } else {
-          setFormFeedback({
-            type: "error",
-            message: "No se pudo actualizar la publicación. Verifica los datos.",
-          });
-        }
+        await updatePost(selectedPost.post_id, payload);
+        setFormFeedback({
+          type: "success",
+          message: "Publicación actualizada exitosamente.",
+        });
+        handleClear();
         return;
       }
 
@@ -109,35 +102,45 @@ export const EditorPage = () => {
         return;
       }
 
-      const created = await createPost({ ...payload, file: nextForm.file });
-      if (created) {
-        setFormFeedback({
-          type: "success",
-          message: "Publicación creada exitosamente.",
-        });
-        handleClear();
-      } else {
-        setFormFeedback({
-          type: "error",
-          message: "No se pudo crear la publicación en el servidor.",
-        });
-      }
+      await createPost({ ...payload, file: nextForm.file });
+      setFormFeedback({
+        type: "success",
+        message: "Publicación creada exitosamente.",
+      });
+      handleClear();
     } catch (err: unknown) {
+      console.error("[EditorPage] Error en handleSubmit:", err);
       const message =
-        err instanceof Error ? err.message : "Error inesperado al procesar la publicación.";
+        err instanceof Error
+          ? err.message
+          : "Error inesperado al procesar la publicación en el servidor.";
       setFormFeedback({ type: "error", message });
+      // Scroll hacia la alerta para que el usuario la vea de inmediato
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleToggleState = async (post: ServicePost) => {
-    await updatePostState(post.post_id, post.post_state_id === 1 ? 2 : 1);
+    try {
+      await updatePostState(post.post_id, post.post_state_id === 1 ? 2 : 1);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Error al cambiar el estado.";
+      setFormFeedback({ type: "error", message });
+    }
   };
 
   const handleDeletePost = async (post: ServicePost) => {
-    await deletePost(post.post_id);
-    if (selectedPost?.post_id === post.post_id) handleClear();
+    try {
+      await deletePost(post.post_id);
+      if (selectedPost?.post_id === post.post_id) handleClear();
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Error al eliminar la publicación.";
+      setFormFeedback({ type: "error", message });
+    }
   };
 
   return (
@@ -159,19 +162,24 @@ export const EditorPage = () => {
           </Card>
 
           {apiError && (
-            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {apiError}
+            <div
+              role="alert"
+              className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 shadow-sm"
+            >
+              ⚠️ {apiError}
             </div>
           )}
 
           {formFeedback && (
             <div
-              className={`rounded-xl border px-4 py-3 text-sm font-semibold ${
+              role="alert"
+              className={`rounded-xl border px-4 py-3 text-sm font-semibold shadow-sm ${
                 formFeedback.type === "success"
                   ? "border-green-200 bg-green-50 text-green-800"
                   : "border-red-200 bg-red-50 text-red-800"
               }`}
             >
+              {formFeedback.type === "error" ? "❌ " : "✅ "}
               {formFeedback.message}
             </div>
           )}
