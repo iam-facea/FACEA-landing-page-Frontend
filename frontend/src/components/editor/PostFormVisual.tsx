@@ -179,20 +179,20 @@ export const PostFormVisual: React.FC<Props> = ({
   };
 
   return (
-    <section className="bg-white rounded-xl shadow-[0px_10px_40px_rgba(13,21,59,0.04)] p-8 mb-16 max-w-4xl mx-auto font-sans">
-      <form className="space-y-8" onSubmit={handleSubmit}>
+    <section className="bg-white rounded-2xl shadow-[0px_10px_40px_rgba(13,21,59,0.04)] p-5 sm:p-7 md:p-8 mb-8 lg:mb-16 max-w-4xl mx-auto font-sans border border-slate-100">
+      <form className="space-y-6 sm:space-y-8" onSubmit={handleSubmit}>
         {validationError && (
           <div
             role="alert"
-            className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700"
+            className="rounded-xl border border-red-200 bg-red-50 p-3.5 sm:p-4 text-xs sm:text-sm font-semibold text-red-700"
           >
             {validationError}
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 md:gap-8">
           {/* Categoría */}
-          <div className="space-y-2">
+          <div className="space-y-1.5 sm:space-y-2">
             <label
               htmlFor="category"
               className="block text-xs font-bold uppercase tracking-widest text-[#46464e] ml-1"
@@ -204,7 +204,7 @@ export const PostFormVisual: React.FC<Props> = ({
               value={state.category}
               onChange={(e) => update({ category: e.target.value })}
               disabled={isBusy}
-              className="w-full bg-[#f3f3f5] border-none outline-none rounded-lg py-4 px-4 text-[#1a1c1d] focus:ring-2 focus:ring-[#0d153b] transition-all appearance-none cursor-pointer disabled:opacity-60"
+              className="w-full bg-[#f3f3f5] border-none outline-none rounded-xl py-3.5 px-4 text-[#1a1c1d] focus:ring-2 focus:ring-[#0d153b] transition-all appearance-none cursor-pointer disabled:opacity-60 text-sm sm:text-base"
             >
               <option value="Noticias">Noticias</option>
               <option value="Eventos">Eventos</option>
@@ -215,7 +215,7 @@ export const PostFormVisual: React.FC<Props> = ({
           </div>
 
           {/* Título */}
-          <div className="space-y-2">
+          <div className="space-y-1.5 sm:space-y-2">
             <label
               htmlFor="title"
               className="block text-xs font-bold uppercase tracking-widest text-[#46464e] ml-1"
@@ -228,7 +228,7 @@ export const PostFormVisual: React.FC<Props> = ({
               maxLength={160}
               onChange={(e) => update({ title: e.target.value })}
               disabled={isBusy}
-              className="w-full bg-[#f3f3f5] border-none outline-none rounded-lg py-4 px-4 text-[#1a1c1d] placeholder:text-[#76767f] focus:ring-2 focus:ring-[#0d153b] transition-all disabled:opacity-60"
+              className="w-full bg-[#f3f3f5] border-none outline-none rounded-xl py-3.5 px-4 text-[#1a1c1d] placeholder:text-[#76767f] focus:ring-2 focus:ring-[#0d153b] transition-all disabled:opacity-60 text-sm sm:text-base"
               placeholder="Escribe un título atractivo (máx 160 caracteres)..."
               type="text"
               required
@@ -236,7 +236,7 @@ export const PostFormVisual: React.FC<Props> = ({
           </div>
 
           {/* Fecha (YYYY-MM-DD) */}
-          <div className="space-y-2">
+          <div className="space-y-1.5 sm:space-y-2">
             <label
               htmlFor="date"
               className="block text-xs font-bold uppercase tracking-widest text-[#46464e] ml-1"
@@ -249,13 +249,13 @@ export const PostFormVisual: React.FC<Props> = ({
               value={state.date}
               onChange={(e) => update({ date: e.target.value })}
               disabled={isBusy}
-              className="w-full bg-[#f3f3f5] border-none outline-none rounded-lg py-4 px-4 text-[#1a1c1d] focus:ring-2 focus:ring-[#0d153b] transition-all cursor-pointer disabled:opacity-60"
+              className="w-full bg-[#f3f3f5] border-none outline-none rounded-xl py-3.5 px-4 text-[#1a1c1d] focus:ring-2 focus:ring-[#0d153b] transition-all cursor-pointer disabled:opacity-60 text-sm sm:text-base"
               required
             />
           </div>
 
           {/* Estado */}
-          <div className="space-y-2">
+          <div className="space-y-1.5 sm:space-y-2">
             <label
               htmlFor="postState"
               className="block text-xs font-bold uppercase tracking-widest text-[#46464e] ml-1"
@@ -269,7 +269,7 @@ export const PostFormVisual: React.FC<Props> = ({
                 update({ postState: e.target.value as FormState["postState"] })
               }
               disabled={isBusy}
-              className="w-full bg-[#f3f3f5] border-none outline-none rounded-lg py-4 px-4 text-[#1a1c1d] focus:ring-2 focus:ring-[#0d153b] transition-all appearance-none cursor-pointer disabled:opacity-60"
+              className="w-full bg-[#f3f3f5] border-none outline-none rounded-xl py-3.5 px-4 text-[#1a1c1d] focus:ring-2 focus:ring-[#0d153b] transition-all appearance-none cursor-pointer disabled:opacity-60 text-sm sm:text-base"
             >
               <option value="publico">Público (published)</option>
               <option value="oculta">Borrador (draft)</option>
@@ -278,7 +278,7 @@ export const PostFormVisual: React.FC<Props> = ({
         </div>
 
         {/* Descripción Breve */}
-        <div className="space-y-2">
+        <div className="space-y-1.5 sm:space-y-2">
           <label
             htmlFor="description"
             className="block text-xs font-bold uppercase tracking-widest text-[#46464e] ml-1"
@@ -291,7 +291,7 @@ export const PostFormVisual: React.FC<Props> = ({
             maxLength={1000}
             onChange={(e) => update({ description: e.target.value })}
             disabled={isBusy}
-            className="w-full bg-[#f3f3f5] border-none outline-none rounded-lg py-4 px-4 text-[#1a1c1d] placeholder:text-[#76767f] focus:ring-2 focus:ring-[#0d153b] transition-all resize-none disabled:opacity-60"
+            className="w-full bg-[#f3f3f5] border-none outline-none rounded-xl py-3.5 px-4 text-[#1a1c1d] placeholder:text-[#76767f] focus:ring-2 focus:ring-[#0d153b] transition-all resize-none disabled:opacity-60 text-sm sm:text-base"
             placeholder="Describe el contenido de la publicación (máx 1000 caracteres)..."
             rows={4}
             required
@@ -299,7 +299,7 @@ export const PostFormVisual: React.FC<Props> = ({
         </div>
 
         {/* Zona de Carga de Imagen (Paso 1) */}
-        <div className="space-y-2">
+        <div className="space-y-1.5 sm:space-y-2">
           <label className="block text-xs font-bold uppercase tracking-widest text-[#46464e] ml-1">
             Imagen Destacada (JPG, PNG, WebP — máx 5 MB)
           </label>
@@ -308,12 +308,12 @@ export const PostFormVisual: React.FC<Props> = ({
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onClick={() => !isBusy && fileInputRef.current?.click()}
-            className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center transition-colors group cursor-pointer ${
+            className={`border-2 border-dashed rounded-2xl p-5 sm:p-8 flex flex-col items-center justify-center transition-colors group cursor-pointer text-center ${
               isBusy ? "cursor-not-allowed opacity-60" : ""
             } ${
               isDragging
                 ? "border-[#0d153b] bg-[#e0e1f7]"
-                : "border-[#c7c5cf] bg-[#ffffff] hover:bg-[#f3f3f5]"
+                : "border-[#c7c5cf] bg-[#ffffff] hover:bg-[#f3f3f5] active:bg-[#e0e1f7]/50"
             }`}
           >
             <input
@@ -327,7 +327,7 @@ export const PostFormVisual: React.FC<Props> = ({
               accept="image/jpeg,image/png,image/webp"
             />
             <svg
-              className="w-12 h-12 text-[#c7c5cf] group-hover:text-[#0d153b] transition-colors mb-2"
+              className="w-10 h-10 sm:w-12 sm:h-12 text-[#c7c5cf] group-hover:text-[#0d153b] transition-colors mb-2"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -339,44 +339,44 @@ export const PostFormVisual: React.FC<Props> = ({
                 d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
               />
             </svg>
-            <p className="text-[#1a1c1d] font-medium text-sm">
-              Arrastra y suelta tu imagen aquí o haz clic para explorar
+            <p className="text-[#1a1c1d] font-semibold text-xs sm:text-sm">
+              Toca para seleccionar foto o arrástrala aquí
             </p>
-            <p className="text-[#76767f] text-xs mt-1">
-              Formatos válidos: JPG, PNG, WebP (hasta 5 MB)
+            <p className="text-[#76767f] text-[11px] sm:text-xs mt-1">
+              JPG, PNG o WebP (hasta 5 MB y máx 4096 px)
             </p>
 
             {/* Previsualización del archivo seleccionado */}
             {state.file && (
-              <div className="mt-4 px-4 py-2 bg-[#e0e1f7] text-[#0d153b] rounded-lg text-xs font-semibold flex items-center gap-2">
+              <div className="mt-3 px-3 py-1.5 sm:px-4 sm:py-2 bg-[#e0e1f7] text-[#0d153b] rounded-lg text-xs font-semibold flex items-center gap-2 max-w-full truncate">
                 <span>📁 {state.file.name}</span>
                 <span>({(state.file.size / (1024 * 1024)).toFixed(2)} MB)</span>
               </div>
             )}
             {!state.file && state.image && (
-              <div className="mt-4 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold">
+              <div className="mt-3 px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold">
                 <span>Imagen actual guardada en el servidor</span>
               </div>
             )}
           </div>
         </div>
 
-        {/* Botones de Acción */}
-        <div className="flex justify-end items-center gap-4 pt-4 border-t border-[#eeeef0]">
+        {/* Botones de Acción: Fila en desktop, columna fluida en móvil */}
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end items-stretch sm:items-center gap-3 sm:gap-4 pt-4 border-t border-[#eeeef0]">
           <Button
             type="button"
             variant="secondary"
             onClick={handleClear}
             disabled={isBusy}
-            className="px-8"
+            className="w-full sm:w-auto px-6 py-3"
           >
-            Limpiar
+            Limpiar Formulario
           </Button>
 
           <button
             type="submit"
             disabled={isBusy}
-            className="px-10 py-3 rounded-full bg-[#bd222f] text-white font-bold hover:scale-105 shadow-lg shadow-[#bd222f]/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="w-full sm:w-auto px-8 py-3.5 rounded-xl sm:rounded-full bg-[#bd222f] text-white font-bold hover:scale-105 shadow-lg shadow-[#bd222f]/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 text-sm sm:text-base"
           >
             {isBusy ? "Guardando..." : submitLabel}
           </button>
