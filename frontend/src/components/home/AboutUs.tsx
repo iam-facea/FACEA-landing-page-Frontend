@@ -10,21 +10,21 @@ import musicaImage from "../../assets/images/Musica.jpg"; // Ajusta el nombre
 const valores = [
   {
     id: "origen",
-    titulo: "El Origen",
+    titulo: "Misión",
     texto:
-      "Nacimos en la Universidad Adventista del Plata como una iniciativa de estudiantes comprometidos con la misión.",
+      "Acercar a los jóvenes a Dios mediante el estudio de la Biblia, las actividades y el compañerismo, fortaleciendo su fe y sentido de pertenencia.",
   },
   {
     id: "valores",
-    titulo: "Valores Cristianos",
+    titulo: "Visión",
     texto:
-      "Desde el primer día, nuestra brújula ha sido el servicio abnegado y la vivencia práctica del evangelio.",
+      "Ser una comunidad unida donde cada estudiante pueda crecer espiritualmente, desarrollar sus capacidades y encontrar oportunidades para servir y compartir su fe.",
   },
   {
     id: "crecimiento",
-    titulo: "Crecimiento",
+    titulo: "Valores",
     texto:
-      "Lo que comenzó como un pequeño círculo de oración se transformó en un pilar fundamental de la vida universitaria.",
+      "Promovemos el trabajo en equipo, el apoyo mutuo, el compromiso y el servicio, construyendo una comunidad basada en el respeto, el compañerismo y el amor a Dios.",
   },
 ];
 
@@ -38,13 +38,12 @@ export const AboutUs = () => {
             Quiénes Somos
           </span>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-[#0d153b] sm:text-4xl md:text-5xl">
-            Forjando identidad desde 2008
+            Una comunidad para crecer en la fe y servir juntos
           </h2>
           <p className="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-[#46464e] sm:mt-6 sm:text-lg">
-            Somos un grupo de estudiantes que representa con orgullo a la
-            Facultad de Ciencias Económicas y de la Administración. Nuestro
-            propósito central es nutrir la vida espiritual, creando un espacio
-            de fe, apoyo mutuo y servicio desinteresado.
+            En IAM FACEA compartimos la fe, fortalecemos el compañerismo y
+            creamos oportunidades para que cada estudiante participe, crezca y
+            sirva a los demás.
           </p>
         </div>
 
@@ -127,8 +126,14 @@ export const AboutUs = () => {
             </article>
 
             {/* Departamentos */}
-            <article className="group flex flex-col gap-6 rounded-2xl bg-white border border-slate-200/60 p-6 sm:p-8 transition-all duration-300 md:col-span-8 md:row-span-1 md:flex-row md:items-center md:gap-8 md:p-10 shadow-sm">
-              <div className="flex-1">
+            <article className="group relative min-h-[240px] overflow-hidden rounded-2xl bg-white md:col-span-8 md:row-span-1 shadow-sm">
+              <img
+                alt="Comunicación y Música"
+                className="absolute inset-0 h-full w-full object-cover opacity-40 transition-transform duration-700 group-hover:scale-105"
+                src={musicaImage}
+                loading="lazy"
+              />
+              <div className="relative z-20 flex h-full flex-col justify-end p-6 sm:p-8 md:p-10">
                 <h3 className="mb-2 text-xl font-bold text-[#0d153b] sm:text-2xl sm:mb-3">
                   Nuestros Departamentos
                 </h3>
@@ -137,14 +142,6 @@ export const AboutUs = () => {
                   nuestras actividades y extienden nuestro mensaje con
                   excelencia y creatividad.
                 </p>
-              </div>
-              <div className="h-44 w-full overflow-hidden rounded-xl bg-[#e2e2e4] shadow-sm transition-all duration-300 group-hover:shadow-md sm:h-52 md:h-full md:w-72 relative">
-                <img
-                  alt="Comunicación y Música"
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  src={musicaImage}
-                  loading="lazy"
-                />
               </div>
             </article>
           </div>
