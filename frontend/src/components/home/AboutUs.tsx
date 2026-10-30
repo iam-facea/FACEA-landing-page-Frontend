@@ -2,7 +2,7 @@ import { Card } from "../ui/Card";
 import { Container } from "../ui/Container";
 
 // Importa aquí tus imágenes (asegúrate de que las rutas sean correctas)
-import gruposMisioneros from "../../assets/images/vigilia.jpg";
+import gruposMisioneros from "../../assets/images/ESCUEL SABATICA.jpg.jpeg";
 import comisionFaros from "../../assets/images/Comision Faros.jpg"; // Ajusta el nombre
 import grupoOracion from "../../assets/images/Grupo-oracion.jpeg"; // Ajusta el nombre
 import musicaImage from "../../assets/images/Musica.jpg"; // Ajusta el nombre
