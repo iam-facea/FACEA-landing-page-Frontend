@@ -50,13 +50,14 @@ export const PostCardsEditor = ({
             </div>
           </div>
 
-          {/* Botonera de acciones */}
-          <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
-            <div className="flex gap-2">
+          {/* Botonera de acciones táctil y segura */}
+          <div className="p-3.5 sm:p-4 bg-slate-50 border-t border-slate-100 flex flex-wrap sm:flex-nowrap justify-between items-center gap-2 sm:gap-3">
+            <div className="flex flex-wrap items-center gap-2">
               <Button
                 size="sm"
                 variant="secondary"
                 onClick={() => onEdit(post)}
+                className="text-xs sm:text-sm py-2 px-3 sm:px-4"
               >
                 Editar
               </Button>
@@ -64,11 +65,13 @@ export const PostCardsEditor = ({
                 size="sm"
                 variant={post.post_state_id === 1 ? "secondary" : "primary"}
                 onClick={() => onToggleState(post)}
+                className="text-xs sm:text-sm py-2 px-3 sm:px-4"
               >
                 {post.post_state_id === 1 ? "Pasar a Borrador" : "Publicar"}
               </Button>
             </div>
             <button
+              type="button"
               onClick={() => {
                 if (
                   window.confirm(
@@ -77,7 +80,7 @@ export const PostCardsEditor = ({
                 )
                   onDelete(post);
               }}
-              className="text-slate-400 hover:text-red-600 text-sm font-bold px-3 py-2 transition-colors cursor-pointer"
+              className="text-slate-500 hover:text-red-600 active:text-red-700 text-xs sm:text-sm font-semibold px-2.5 py-2 transition-colors cursor-pointer rounded-lg hover:bg-red-50"
             >
               Eliminar
             </button>
