@@ -13,19 +13,24 @@ export const EditorPage = () => {
   const {
     posts,
     isLoading,
-    error,
+    error: apiError,
     createPost,
     updatePost,
     updatePostState,
     deletePost,
   } = useNews("all");
   const [selectedPost, setSelectedPost] = useState<ServicePost | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [formFeedback, setFormFeedback] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
   const [form, setForm] = useState<FormState>({
     title: "",
     description: "",
     category: "Noticias",
-    date: "",
+    date: new Date().toISOString().split("T")[0],
     image: "",
     postState: "publico",
     file: null,
@@ -33,19 +38,22 @@ export const EditorPage = () => {
 
   const handleClear = () => {
     setSelectedPost(null);
+    setFormFeedback(null);
     setForm({
       title: "",
       description: "",
       category: "Noticias",
-      date: "",
+      date: new Date().toISOString().split("T")[0],
       image: "",
       postState: "publico",
       file: null,
+      imageContentId: undefined,
     });
   };
 
   const handleEditPost = (post: ServicePost) => {
     setSelectedPost(post);
+    setFormFeedback(null);
     setForm({
       title: post.title,
       description: post.description,
@@ -54,35 +62,73 @@ export const EditorPage = () => {
       image: post.image ?? post.imageUrl ?? "",
       postState: post.post_state_id === 1 ? "publico" : "oculta",
       file: null,
+      imageContentId: post.imageContentId,
     });
+    // Scroll suave hacia el formulario para facilitar la edición
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSubmit = async (nextForm: FormState) => {
-    const payload = {
-      title: nextForm.title,
-      description: nextForm.description,
-      category: nextForm.category,
-      date: nextForm.date,
-      url: undefined,
-      postStateId: nextForm.postState === "publico" ? 1 : 2,
-      file: nextForm.file,
-    };
+    setSubmitting(true);
+    setFormFeedback(null);
 
-    if (selectedPost) {
-      await updatePost(selectedPost.post_id, payload);
-      handleClear();
-      return;
+    try {
+      const payload = {
+        title: nextForm.title.trim(),
+        description: nextForm.description.trim(),
+        category: nextForm.category.trim(),
+        date: nextForm.date,
+        url: undefined,
+        postStateId: nextForm.postState === "publico" ? 1 : 2,
+        file: nextForm.file,
+        imageContentId: nextForm.imageContentId,
+      };
+
+      if (selectedPost) {
+        const updated = await updatePost(selectedPost.post_id, payload);
+        if (updated) {
+          setFormFeedback({
+            type: "success",
+            message: "Publicación actualizada exitosamente.",
+          });
+          handleClear();
+        } else {
+          setFormFeedback({
+            type: "error",
+            message: "No se pudo actualizar la publicación. Verifica los datos.",
+          });
+        }
+        return;
+      }
+
+      if (!nextForm.file) {
+        setFormFeedback({
+          type: "error",
+          message: "Debes seleccionar una imagen para la publicación.",
+        });
+        return;
+      }
+
+      const created = await createPost({ ...payload, file: nextForm.file });
+      if (created) {
+        setFormFeedback({
+          type: "success",
+          message: "Publicación creada exitosamente.",
+        });
+        handleClear();
+      } else {
+        setFormFeedback({
+          type: "error",
+          message: "No se pudo crear la publicación en el servidor.",
+        });
+      }
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Error inesperado al procesar la publicación.";
+      setFormFeedback({ type: "error", message });
+    } finally {
+      setSubmitting(false);
     }
-
-    if (!nextForm.file) {
-      alert(
-        "¡Atención! Debes seleccionar una imagen destacada antes de publicar.",
-      );
-      return;
-    }
-
-    await createPost({ ...payload, file: nextForm.file });
-    handleClear();
   };
 
   const handleToggleState = async (post: ServicePost) => {
@@ -98,26 +144,35 @@ export const EditorPage = () => {
     <div className="min-h-screen bg-[#f9f9fb]">
       <EditorNavBar />
 
-      {/* Usamos el componente genérico Container */}
       <Container className="py-10">
         <div className="flex flex-col gap-8">
-          {/* Usamos tu UI Kit Card en lugar de un section con estilos sueltos */}
           <Card padding="lg">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#bd222f]">
-              Panel de Administración
+              Panel de Administración (IAM FACEA)
             </p>
             <h1 className="mt-3 text-3xl font-bold text-[#0d153b]">
-              Gestión de noticias FACEA
+              Gestión editorial de publicaciones
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
-              Crea, edita o elimina publicaciones. Todo cambio aquí se reflejará
-              instantáneamente en la Landing Page.
+              Crea, edita o elimina publicaciones utilizando el backend de Supabase. Todo cambio publicado se reflejará instantáneamente en la Landing Page.
             </p>
           </Card>
 
-          {error && (
+          {apiError && (
             <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {error}
+              {apiError}
+            </div>
+          )}
+
+          {formFeedback && (
+            <div
+              className={`rounded-xl border px-4 py-3 text-sm font-semibold ${
+                formFeedback.type === "success"
+                  ? "border-green-200 bg-green-50 text-green-800"
+                  : "border-red-200 bg-red-50 text-red-800"
+              }`}
+            >
+              {formFeedback.message}
             </div>
           )}
 
@@ -131,6 +186,7 @@ export const EditorPage = () => {
                   onChange={setForm}
                   onClear={handleClear}
                   onSubmit={handleSubmit}
+                  submitting={submitting}
                   submitLabel={
                     selectedPost ? "Actualizar Noticia" : "Publicar Noticia"
                   }
@@ -141,15 +197,14 @@ export const EditorPage = () => {
               <div className="lg:col-span-5">
                 <div className="sticky top-24">
                   <h3 className="text-lg font-semibold text-[#0d153b] mb-4">
-                    Previsualización
+                    Previsualización en tiempo real
                   </h3>
 
-                  {/* Contenedor que evita el "achatamiento" simulando el ancho del carrusel */}
                   <div className="h-[450px] w-full rounded-3xl shadow-lg ring-1 ring-slate-200">
                     <PostCard
                       post={
                         {
-                          post_id: 0,
+                          post_id: "preview-id",
                           title: form.title || "Escribe un título atractivo...",
                           description:
                             form.description ||
@@ -161,9 +216,8 @@ export const EditorPage = () => {
                           imageUrl: form.image,
                           post_state_id: form.postState === "publico" ? 1 : 2,
                           state:
-                            form.postState === "publico" ? "Público" : "Oculto",
-                          views: 0,
-                        } as unknown as ServicePost
+                            form.postState === "publico" ? "Público" : "Borrador",
+                        } as ServicePost
                       }
                       isLarge={true}
                     />
@@ -186,7 +240,7 @@ export const EditorPage = () => {
               {isLoading ? (
                 <Card className="p-16 text-center text-slate-500 border-dashed border-2">
                   <span className="animate-pulse">
-                    Cargando la base de datos...
+                    Consultando base de datos de Supabase...
                   </span>
                 </Card>
               ) : (
