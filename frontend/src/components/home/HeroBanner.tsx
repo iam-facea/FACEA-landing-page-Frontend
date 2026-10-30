@@ -22,17 +22,11 @@ export const HeroBanner = () => {
           IAM FACEA
         </h1>
         <p className="mx-auto mb-8 max-w-2xl px-2 text-base font-light leading-relaxed text-[#46464e] sm:mb-10 sm:text-xl md:text-2xl">
-          Instituto de alumnos misioneros de la facultad de ciencias económicas
-          y la administración
+          Instituto de Alumnos Misioneros de la Facultad de Ciencias Económicas y de la Administración.
         </p>
 
         {/* Botones de acción: ancho completo en móvil para fácil pulsación táctil */}
         <div className="flex w-full max-w-xs flex-col gap-3 sm:max-w-none sm:w-auto sm:flex-row sm:gap-4">
-          <a href="#actividades" className="w-full sm:w-auto">
-            <Button variant="primary" size="lg" fullWidth>
-              Involúcrate
-            </Button>
-          </a>
           <a href="#nosotros" className="w-full sm:w-auto">
             <Button variant="secondary" size="lg" fullWidth>
               Conoce más
