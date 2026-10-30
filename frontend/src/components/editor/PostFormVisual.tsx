@@ -42,12 +42,14 @@ export const PostFormVisual: React.FC<Props> = ({
     },
   );
 
+  const [internalSubmitting, setInternalSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const controlled = Boolean(form && onChange);
   const state = controlled ? (form as FormState) : local;
+  const isBusy = submitting || internalSubmitting;
 
   const update = (patch: Partial<FormState>) => {
     const next = { ...state, ...patch };
@@ -114,7 +116,6 @@ export const PostFormVisual: React.FC<Props> = ({
     update({
       image: URL.createObjectURL(file),
       file,
-      // Al cambiar de archivo reseteamos el ID anterior para forzar nueva subida
       imageContentId: undefined,
     });
   };
@@ -142,7 +143,14 @@ export const PostFormVisual: React.FC<Props> = ({
     }
 
     if (onSubmit) {
-      await onSubmit(state);
+      setInternalSubmitting(true);
+      try {
+        await onSubmit(state);
+      } catch (err: unknown) {
+        console.error("[PostFormVisual] Error en onSubmit:", err);
+      } finally {
+        setInternalSubmitting(false);
+      }
     }
   };
 
@@ -171,7 +179,7 @@ export const PostFormVisual: React.FC<Props> = ({
               id="category"
               value={state.category}
               onChange={(e) => update({ category: e.target.value })}
-              disabled={submitting}
+              disabled={isBusy}
               className="w-full bg-[#f3f3f5] border-none outline-none rounded-lg py-4 px-4 text-[#1a1c1d] focus:ring-2 focus:ring-[#0d153b] transition-all appearance-none cursor-pointer disabled:opacity-60"
             >
               <option value="Noticias">Noticias</option>
@@ -195,7 +203,7 @@ export const PostFormVisual: React.FC<Props> = ({
               value={state.title}
               maxLength={160}
               onChange={(e) => update({ title: e.target.value })}
-              disabled={submitting}
+              disabled={isBusy}
               className="w-full bg-[#f3f3f5] border-none outline-none rounded-lg py-4 px-4 text-[#1a1c1d] placeholder:text-[#76767f] focus:ring-2 focus:ring-[#0d153b] transition-all disabled:opacity-60"
               placeholder="Escribe un título atractivo (máx 160 caracteres)..."
               type="text"
@@ -216,7 +224,7 @@ export const PostFormVisual: React.FC<Props> = ({
               type="date"
               value={state.date}
               onChange={(e) => update({ date: e.target.value })}
-              disabled={submitting}
+              disabled={isBusy}
               className="w-full bg-[#f3f3f5] border-none outline-none rounded-lg py-4 px-4 text-[#1a1c1d] focus:ring-2 focus:ring-[#0d153b] transition-all cursor-pointer disabled:opacity-60"
               required
             />
@@ -236,7 +244,7 @@ export const PostFormVisual: React.FC<Props> = ({
               onChange={(e) =>
                 update({ postState: e.target.value as FormState["postState"] })
               }
-              disabled={submitting}
+              disabled={isBusy}
               className="w-full bg-[#f3f3f5] border-none outline-none rounded-lg py-4 px-4 text-[#1a1c1d] focus:ring-2 focus:ring-[#0d153b] transition-all appearance-none cursor-pointer disabled:opacity-60"
             >
               <option value="publico">Público (published)</option>
@@ -258,7 +266,7 @@ export const PostFormVisual: React.FC<Props> = ({
             value={state.description}
             maxLength={1000}
             onChange={(e) => update({ description: e.target.value })}
-            disabled={submitting}
+            disabled={isBusy}
             className="w-full bg-[#f3f3f5] border-none outline-none rounded-lg py-4 px-4 text-[#1a1c1d] placeholder:text-[#76767f] focus:ring-2 focus:ring-[#0d153b] transition-all resize-none disabled:opacity-60"
             placeholder="Describe el contenido de la publicación (máx 1000 caracteres)..."
             rows={4}
@@ -275,9 +283,9 @@ export const PostFormVisual: React.FC<Props> = ({
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            onClick={() => !submitting && fileInputRef.current?.click()}
+            onClick={() => !isBusy && fileInputRef.current?.click()}
             className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center transition-colors group cursor-pointer ${
-              submitting ? "cursor-not-allowed opacity-60" : ""
+              isBusy ? "cursor-not-allowed opacity-60" : ""
             } ${
               isDragging
                 ? "border-[#0d153b] bg-[#e0e1f7]"
@@ -287,7 +295,7 @@ export const PostFormVisual: React.FC<Props> = ({
             <input
               type="file"
               ref={fileInputRef}
-              disabled={submitting}
+              disabled={isBusy}
               onChange={(e) =>
                 e.target.files && handleFileSelect(e.target.files[0])
               }
@@ -335,7 +343,7 @@ export const PostFormVisual: React.FC<Props> = ({
             type="button"
             variant="secondary"
             onClick={handleClear}
-            disabled={submitting}
+            disabled={isBusy}
             className="px-8"
           >
             Limpiar
@@ -343,10 +351,10 @@ export const PostFormVisual: React.FC<Props> = ({
 
           <button
             type="submit"
-            disabled={submitting}
+            disabled={isBusy}
             className="px-10 py-3 rounded-full bg-[#bd222f] text-white font-bold hover:scale-105 shadow-lg shadow-[#bd222f]/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            {submitting ? "Guardando..." : submitLabel}
+            {isBusy ? "Guardando..." : submitLabel}
           </button>
         </div>
       </form>

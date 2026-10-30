@@ -40,7 +40,6 @@ export async function edgeFunctionRequest<T>(
   const url = `${baseUrl}${normalizedEndpoint}`;
 
   const headers = new Headers(options.headers ?? {});
-  // Solo seteamos Accept si no viene configurado
   if (!headers.has("Accept")) {
     headers.set("Accept", "application/json");
   }
@@ -53,10 +52,33 @@ export async function edgeFunctionRequest<T>(
     }
   }
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  });
+  // Timeout preventivo de 15 segundos para que la UI jamás quede congelada si la red cuelga
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers,
+      signal: options.signal ?? controller.signal,
+    });
+  } catch (fetchErr: unknown) {
+    clearTimeout(timeoutId);
+    if (fetchErr instanceof DOMException && fetchErr.name === "AbortError") {
+      throw new EdgeFunctionError(
+        "Tiempo de espera agotado al conectar con el servidor (timeout 15s).",
+        408,
+      );
+    }
+    // Error de red típico (CORS o sin conexión)
+    throw new EdgeFunctionError(
+      "Error de conexión con el servidor. Verifica las políticas CORS o tu conexión de red.",
+      0,
+    );
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   if (!response.ok) {
     let errorMessage = `Error en el servidor (${response.status})`;
@@ -81,7 +103,7 @@ export async function edgeFunctionRequest<T>(
         errorMessage = "Sesión expirada o no autorizada. Por favor iniciá sesión nuevamente.";
         break;
       case 403:
-        errorMessage = "Acceso denegado: tu usuario no tiene permisos de edición.";
+        errorMessage = "Acceso denegado: tu usuario no tiene permisos de edición (403 Forbidden).";
         break;
       case 404:
         errorMessage = "La publicación solicitada no fue encontrada.";
