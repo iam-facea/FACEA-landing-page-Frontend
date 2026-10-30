@@ -37,22 +37,24 @@ export const PostCard = ({ post, isLarge = false }: PostCardProps) => {
         </div>
       )}
 
-      <div className={`relative z-10 ${isLarge ? "p-8 md:p-10" : "p-6"}`}>
+      <div className={`relative z-10 ${isLarge ? "p-5 sm:p-8 md:p-10" : "p-4 sm:p-6"}`}>
         {/* Usamos post.date */}
-        <span className="text-sm font-medium text-white/70 mb-2 block">
+        <span className="text-xs sm:text-sm font-medium text-white/70 mb-1.5 sm:mb-2 block">
           {post.date.split("T")[0]} {/* Solo mostramos la fecha sin la hora */}
         </span>
 
         {/* Usamos post.title */}
         <h3
-          className={`font-bold leading-tight text-white mb-2 ${isLarge ? "text-3xl md:text-4xl" : "text-xl"}`}
+          className={`font-bold leading-tight text-white mb-2 line-clamp-2 ${
+            isLarge ? "text-xl sm:text-2xl md:text-4xl" : "text-base sm:text-lg md:text-xl"
+          }`}
         >
           {post.title}
         </h3>
 
         {/* Usamos post.description */}
         {isLarge && (
-          <p className="line-clamp-2 text-white/70 text-lg">
+          <p className="line-clamp-2 text-white/80 text-xs sm:text-sm md:text-base leading-relaxed">
             {post.description}
           </p>
         )}
