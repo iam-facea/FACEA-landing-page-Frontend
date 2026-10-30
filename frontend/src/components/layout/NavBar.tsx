@@ -143,24 +143,24 @@ export const NavBar = () => {
         </div>
       </div>
 
-      {/* 4. MENÚ DESPLEGABLE MÓVIL */}
+      {/* 4. MENÚ DESPLEGABLE MÓVIL CON SCROLL INTERNO SEGURO */}
       <div
-        className={`absolute left-0 top-16 w-full border-b border-slate-200/40 bg-[#f9f9fb]/95 p-6 shadow-xl backdrop-blur-xl md:hidden origin-top transform transition-all duration-300 ease-out ${
+        className={`absolute left-0 top-16 w-full max-h-[calc(100vh-4rem)] overflow-y-auto border-b border-slate-200/40 bg-[#f9f9fb]/98 p-6 shadow-2xl backdrop-blur-xl md:hidden origin-top transform transition-all duration-300 ease-out ${
           isMenuOpen
             ? "visible translate-y-0 opacity-100"
-            : "invisible -translate-y-4 opacity-0"
+            : "invisible -translate-y-4 opacity-0 pointer-events-none"
         }`}
       >
-        <div className="flex flex-col space-y-4">
-          {/* Mapeo dinámico de los enlaces Móviles */}
+        <div className="flex flex-col space-y-2">
+          {/* Mapeo dinámico de los enlaces Móviles con área táctil cómoda (48px touch target) */}
           {NAV_LINKS.map((link) => (
             <a
               key={link.id}
               href={link.href}
               onClick={handleNavClick}
-              className={`text-base tracking-wide transition-colors ${
+              className={`flex items-center rounded-lg px-3 py-3 text-base tracking-wide transition-colors active:bg-slate-200/50 ${
                 activeSection === link.id
-                  ? "font-bold text-[#bd222f]"
+                  ? "font-bold text-[#bd222f] bg-red-50/60"
                   : "font-medium text-[#64748b] hover:text-[#0d153b]"
               }`}
             >
@@ -168,15 +168,16 @@ export const NavBar = () => {
             </a>
           ))}
 
-          <div className="mt-4 border-t border-slate-200 pt-6 flex flex-col gap-4">
+          <div className="mt-4 border-t border-slate-200/80 pt-6 flex flex-col gap-4 pb-4">
             <Link
               to="/login"
-              className="text-center text-sm font-medium text-[#64748b] hover:text-[#0d153b]"
+              onClick={handleNavClick}
+              className="flex items-center justify-center rounded-lg py-3 text-sm font-semibold text-[#64748b] hover:text-[#0d153b] active:bg-slate-200/40"
             >
               Acceso Administrador
             </Link>
 
-            <Button variant="primary" fullWidth onClick={toggleMenu}>
+            <Button variant="primary" fullWidth size="lg" onClick={toggleMenu}>
               Tienda y Donaciones
             </Button>
           </div>
