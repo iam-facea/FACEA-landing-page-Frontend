@@ -9,13 +9,11 @@ export const PostDetailsPage = () => {
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const { getPostById, incrementViews } = useNews();
+  const { getPostById } = useNews();
 
   useEffect(() => {
-    // Al llamar a getById, el backend en .NET sumará automáticamente post.Views++
     if (id) {
-      incrementViews(id) // Llamada para incrementar las vistas
-        .then(() => getPostById(id)) // Luego obtenemos los detalles (GET) del post
+      getPostById(id)
         .then((data) => setPost(data))
         .catch((err) => console.error(err))
         .finally(() => setIsLoading(false));
@@ -84,9 +82,9 @@ export const PostDetailsPage = () => {
           <div className="p-8 md:p-14">
             <div className="flex justify-between items-center mb-8 text-sm text-slate-500 font-semibold border-b border-slate-100 pb-4">
               <span>{post.date.split("T")[0]}</span>
-              {/* ¡Aquí mostramos las vistas reales del backend! */}
+              {/* Badge de categoría sutil */}
               <span className="flex items-center gap-2 bg-slate-100 px-3 py-1 rounded-full text-[#0d153b]">
-                👁️ {post.views} vistas
+                {post.category}
               </span>
             </div>
 

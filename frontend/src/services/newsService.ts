@@ -1,174 +1,228 @@
-import { apiRequest } from "./apiClient";
-
-interface ApiPost {
-  id: number;
-  title: string;
-  description: string;
-  category: string;
-  date: string;
-  views?: number;
-  imageUrl?: string | null;
-  postStateId: number; 
-}
+import {
+  publicPublicationsService,
+  editorPublicationsService,
+} from "./publicationService";
+import type {
+  PublicPublication,
+  EditorPublication,
+  PublicationStatus,
+} from "../types/publication";
 
 export interface Post {
-  post_id: number;
+  post_id: string; // UUID de Supabase
   title: string;
   description: string;
   category: string;
-  date: string;
-  image?: string | null;
-  imageUrl?: string | null;
-  url?: string | null;
-  post_state_id: number;
-  state?: string;
+  date: string; // Formato YYYY-MM-DD
+  image: string; // URL pública servida desde CDN / Vercel Blob
+  imageUrl: string;
+  post_state_id: number; // 1 = Publicado, 2 = Borrador
+  state: string; // "Público" | "Borrador"
   views?: number;
+  imageContentId?: string;
 }
 
 export interface CreatePostInput {
   title: string;
   description: string;
   category: string;
-  date: string;
+  date?: string;
   url?: string;
-  postStateId: number;
-  file: File;
+  postStateId?: number;
+  file?: File;
+  imageContentId?: string;
 }
 
 export interface UpdatePostInput {
   title: string;
   description: string;
   category: string;
-  date: string;
+  date?: string;
   url?: string;
-  postStateId: number;
+  postStateId?: number;
   file?: File | null;
+  imageContentId?: string;
 }
 
-const POSTS_PATH = "/api/Posts";
-
-const toPost = (post: ApiPost): Post => ({
-  post_id: post.id,
-  title: post.title,
-  description: post.description,
-  category: post.category,
-  date: post.date,
-  image: post.imageUrl ?? null,
-  imageUrl: post.imageUrl ?? null,
-  url: null,
-  // ¡AQUÍ ESTÁ LA MAGIA! Leemos el número directamente del backend
-  post_state_id: post.postStateId, 
-  state: post.postStateId === 1 ? "Público" : "Oculto",
-  views: post.views,
+export const toPublicViewModel = (pub: PublicPublication): Post => ({
+  post_id: pub.id,
+  title: pub.title,
+  description: pub.description,
+  category: pub.category,
+  date: pub.publicationDate,
+  image: pub.imageUrl,
+  imageUrl: pub.imageUrl,
+  post_state_id: 1,
+  state: "Público",
 });
 
-const buildFormData = (data: CreatePostInput | UpdatePostInput) => {
-  const formData = new FormData();
-  formData.append("Title", data.title);
-  formData.append("Description", data.description);
-  formData.append("Category", data.category);
-  formData.append("PostStateId", String(data.postStateId));
-  formData.append("Date", data.date);
-
-  if (data.url) {
-    formData.append("Url", data.url);
-  }
-
-  if (data.file) {
-    formData.append("File", data.file);
-  }
-
-  return formData;
-};
-
-const requestPosts = async (path: string) => {
-  const posts = await apiRequest<ApiPost[]>(path);
-  return posts.map(toPost);
-};
+export const toEditorViewModel = (pub: EditorPublication): Post => ({
+  post_id: pub.id,
+  title: pub.title,
+  description: pub.description,
+  category: pub.category,
+  date: pub.publicationDate,
+  image: pub.image?.url ?? "",
+  imageUrl: pub.image?.url ?? "",
+  post_state_id: pub.status === "published" ? 1 : 2,
+  state: pub.status === "published" ? "Público" : "Borrador",
+  imageContentId: pub.image?.id,
+});
 
 export const newsService = {
-  getPublished: async (): Promise<Post[]> => requestPosts(`${POSTS_PATH}/public`),
+  /**
+   * Obtiene las publicaciones públicas para el Home / News
+   */
+  getPublished: async (): Promise<Post[]> => {
+    try {
+      const response = await publicPublicationsService.getPublications(20);
+      return response.items.map(toPublicViewModel);
+    } catch (err) {
+      console.warn("[newsService] Error al obtener publicaciones de Supabase:", err);
+      return [];
+    }
+  },
 
-  getAll: async (): Promise<Post[]> => requestPosts(POSTS_PATH),
+  /**
+   * Obtiene todas las publicaciones (editoriales) para el panel de administración
+   */
+  getAll: async (): Promise<Post[]> => {
+    try {
+      const response = await editorPublicationsService.getPublications(50);
+      return response.items.map(toEditorViewModel);
+    } catch {
+      // Si falla la auth o es público, fallback a las públicas
+      return newsService.getPublished();
+    }
+  },
 
+  /**
+   * Obtiene una publicación por UUID (intenta primero editorial, luego pública)
+   */
   getById: async (id: string | number): Promise<Post | null> => {
+    const stringId = String(id);
     try {
-      const post = await apiRequest<ApiPost>(`${POSTS_PATH}/${id}`);
-      return toPost(post);
-    } catch (error) {
-      if (error instanceof Error && "status" in error && (error as { status: number }).status === 404) {
-        return null;
-      }
+      const editorPub = await editorPublicationsService.getPublicationById(stringId);
+      if (editorPub) return toEditorViewModel(editorPub);
+    } catch {
+      // Ignoramos si no hay permisos editoriales
+    }
 
-      throw error;
+    try {
+      const publicPub = await publicPublicationsService.getPublicationById(stringId);
+      return publicPub ? toPublicViewModel(publicPub) : null;
+    } catch {
+      return null;
     }
   },
 
-  create: async (postData: CreatePostInput): Promise<Post> => {
-    const createdPost = await apiRequest<ApiPost>(POSTS_PATH, {
-      method: "POST",
-      body: buildFormData(postData),
+  /**
+   * Crea una publicación en 2 pasos según el contrato:
+   * 1. Sube la imagen a /functions/v1/images si se adjuntó archivo.
+   * 2. Envía el payload JSON con imageContentId a /functions/v1/editor-publications.
+   */
+  create: async (data: CreatePostInput): Promise<Post> => {
+    let imageContentId = data.imageContentId;
+
+    if (data.file && !imageContentId) {
+      const uploadRes = await editorPublicationsService.uploadImage(data.file);
+      imageContentId = uploadRes.id;
+    }
+
+    if (!imageContentId) {
+      throw new Error("Se requiere una imagen para crear la publicación.");
+    }
+
+    const status: PublicationStatus = data.postStateId === 2 ? "draft" : "published";
+
+    const created = await editorPublicationsService.createPublication({
+      title: data.title.trim(),
+      description: data.description.trim(),
+      category: data.category.trim(),
+      publicationDate: data.date,
+      status,
+      imageContentId,
     });
 
-    return toPost(createdPost);
+    return toEditorViewModel(created);
   },
 
-  update: async (id: string | number, postData: UpdatePostInput): Promise<Post | null> => {
-    try {
-      const updatedPost = await apiRequest<ApiPost>(`${POSTS_PATH}/${id}`, {
-        method: "PUT",
-        body: buildFormData(postData),
-      });
+  /**
+   * Actualiza una publicación existente (reemplazo completo PUT)
+   */
+  update: async (
+    id: string | number,
+    data: UpdatePostInput,
+  ): Promise<Post | null> => {
+    const stringId = String(id);
+    let imageContentId = data.imageContentId;
 
-      return toPost(updatedPost);
-    } catch (error) {
-      if (error instanceof Error && "status" in error && (error as { status: number }).status === 404) {
-        return null;
-      }
-
-      throw error;
+    if (data.file) {
+      const uploadRes = await editorPublicationsService.uploadImage(data.file);
+      imageContentId = uploadRes.id;
     }
-  },
 
-  updateState: async (id: string | number, postStateId: number): Promise<Post | null> => {
-    try {
-      const updatedPost = await apiRequest<ApiPost>(`${POSTS_PATH}/${id}/state`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ postStateId }),
-      });
-
-      return toPost(updatedPost);
-    } catch (error) {
-      if (error instanceof Error && "status" in error && (error as { status: number }).status === 404) {
-        return null;
-      }
-
-      throw error;
+    // Si no vino imagen nueva, necesitamos mantener el imageContentId existente
+    if (!imageContentId) {
+      const existing = await editorPublicationsService.getPublicationById(stringId);
+      imageContentId = existing?.image?.id;
     }
+
+    if (!imageContentId) {
+      throw new Error("No se pudo determinar el ID de la imagen para la publicación.");
+    }
+
+    const status: PublicationStatus = data.postStateId === 2 ? "draft" : "published";
+    const publicationDate = data.date || new Date().toISOString().split("T")[0];
+
+    const updated = await editorPublicationsService.replacePublication(stringId, {
+      title: data.title.trim(),
+      description: data.description.trim(),
+      category: data.category.trim(),
+      publicationDate,
+      status,
+      imageContentId,
+    });
+
+    return toEditorViewModel(updated);
   },
 
+  /**
+   * Cambia el estado (publicado/borrador) mediante un replace rápido
+   */
+  updateState: async (
+    id: string | number,
+    postStateId: number,
+  ): Promise<Post | null> => {
+    const stringId = String(id);
+    const existing = await editorPublicationsService.getPublicationById(stringId);
+    if (!existing) return null;
+
+    const status: PublicationStatus = postStateId === 2 ? "draft" : "published";
+
+    const updated = await editorPublicationsService.replacePublication(stringId, {
+      title: existing.title,
+      description: existing.description,
+      category: existing.category,
+      publicationDate: existing.publicationDate,
+      status,
+      imageContentId: existing.image.id,
+    });
+
+    return toEditorViewModel(updated);
+  },
+
+  /**
+   * Elimina una publicación llamando a DELETE /editor-publications/{id}
+   */
   delete: async (id: string | number): Promise<boolean> => {
-    await apiRequest<void>(`${POSTS_PATH}/${id}`, {
-      method: "DELETE",
-    });
+    return editorPublicationsService.deletePublication(String(id));
+  },
 
+  incrementViews: async (): Promise<boolean> => {
+    // ViewsCount fue eliminado deliberadamente del backend según contrato
     return true;
   },
-
-  incrementViews: async (id: string | number): Promise<boolean> => {
-    try {
-      await apiRequest<void>(`${POSTS_PATH}/${id}/view`, {
-        method: "PATCH",
-      });
-      return true;
-    } catch (error) {
-      console.error("Error al incrementar vistas:", error);
-      return false;
-    }
-  }
 };
 
 export default newsService;
