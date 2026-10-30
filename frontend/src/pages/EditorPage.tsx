@@ -143,22 +143,41 @@ export const EditorPage = () => {
 
   const handleToggleState = async (post: ServicePost) => {
     try {
-      await updatePostState(post.post_id, post.post_state_id === 1 ? 2 : 1);
+      const nextStateId = post.post_state_id === 1 ? 2 : 1;
+      await updatePostState(post.post_id, nextStateId);
+      setFormFeedback({
+        type: "success",
+        message:
+          nextStateId === 1
+            ? `La publicación "${post.title}" fue publicada exitosamente.`
+            : `La publicación "${post.title}" fue pasada a borrador exitosamente.`,
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Error al cambiar el estado.";
       setFormFeedback({ type: "error", message });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const handleDeletePost = async (post: ServicePost) => {
     try {
       await deletePost(post.post_id);
-      if (selectedPost?.post_id === post.post_id) handleClear();
+      if (selectedPost?.post_id === post.post_id) {
+        setSelectedPost(null);
+        resetFormState();
+      }
+      setFormFeedback({
+        type: "success",
+        message: `La publicación "${post.title}" fue eliminada exitosamente.`,
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Error al eliminar la publicación.";
       setFormFeedback({ type: "error", message });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
