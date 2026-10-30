@@ -219,8 +219,9 @@ export const newsService = {
     return editorPublicationsService.deletePublication(String(id));
   },
 
-  incrementViews: async (): Promise<boolean> => {
+  incrementViews: async (id?: string | number): Promise<boolean> => {
     // ViewsCount fue eliminado deliberadamente del backend según contrato
+    void id;
     return true;
   },
 };
