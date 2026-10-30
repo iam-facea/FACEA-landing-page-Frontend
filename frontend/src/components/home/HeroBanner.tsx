@@ -1,38 +1,20 @@
-import faceaLogo from "../../assets/images/FACEA-logo.png";
-import { Button } from "../ui/Button.tsx";
+import heroBackground from "../../assets/images/Foto Todos Juntos.jpg.jpeg";
 
 export const HeroBanner = () => {
   return (
-    // Tailwind CSS: section spacing, responsive typography and button states.
     <section
       id="inicio"
-      className="reveal active relative overflow-hidden px-4 pb-16 pt-24 sm:px-6 sm:pb-24 sm:pt-32 md:pb-32 md:pt-48"
+      className="relative flex min-h-[70vh] w-full items-center justify-center overflow-hidden bg-cover bg-center px-4 py-20 sm:min-h-[80vh] sm:px-6"
+      style={{ backgroundImage: `url("${heroBackground}")` }}
     >
-      <div className="mx-auto flex max-w-7xl flex-col items-center text-center">
-        {/* Logo con contenedor responsive que no desborda en móviles */}
-        <div className="mb-8 flex h-20 w-20 items-center justify-center sm:mb-10 sm:h-24 sm:w-24 md:h-32 md:w-32">
-          <img
-            alt="IAM FACEA Official Brandmark"
-            className="h-full w-full object-contain drop-shadow-md"
-            src={faceaLogo}
-          />
-        </div>
-
-        <h1 className="mb-4 text-4xl font-extrabold tracking-tight text-[#0d153b] sm:text-6xl md:text-7xl">
+      <div className="absolute inset-0 bg-black/60" aria-hidden="true" />
+      <div className="relative z-10 mx-auto max-w-4xl text-center text-white">
+        <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl md:text-7xl">
           IAM FACEA
         </h1>
-        <p className="mx-auto mb-8 max-w-2xl px-2 text-base font-light leading-relaxed text-[#46464e] sm:mb-10 sm:text-xl md:text-2xl">
+        <p className="mx-auto mt-4 max-w-3xl text-base font-light leading-relaxed sm:text-xl md:text-2xl">
           Instituto de Alumnos Misioneros de la Facultad de Ciencias Económicas y de la Administración.
         </p>
-
-        {/* Botones de acción: ancho completo en móvil para fácil pulsación táctil */}
-        <div className="flex w-full max-w-xs flex-col gap-3 sm:max-w-none sm:w-auto sm:flex-row sm:gap-4">
-          <a href="#nosotros" className="w-full sm:w-auto">
-            <Button variant="secondary" size="lg" fullWidth>
-              Conoce más
-            </Button>
-          </a>
-        </div>
       </div>
     </section>
   );
