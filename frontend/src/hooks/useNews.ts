@@ -24,9 +24,13 @@ export const useNews = (mode: NewsMode = "published") => {
           : await newsService.getAll();
 
       setPosts(data);
-    } catch (err) {
-      console.error("Error al cargar las novedades:", err);
-      setError("No se pudieron cargar las novedades.");
+    } catch (err: unknown) {
+      console.error("[useNews] Error al cargar las novedades:", err);
+      const msg =
+        err instanceof Error
+          ? err.message
+          : "No se pudieron cargar las novedades.";
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -36,60 +40,86 @@ export const useNews = (mode: NewsMode = "published") => {
     void loadPosts(mode);
   }, [loadPosts, mode]);
 
-  const createPost = async (postData: CreatePostInput) => {
+  const createPost = async (postData: CreatePostInput): Promise<Post> => {
     try {
       const newPost = await newsService.create(postData);
-      await loadPosts(mode);
+      try {
+        await loadPosts(mode);
+      } catch {
+        // Si falla la recarga pero se creó, retornamos la nueva
+      }
       return newPost;
-    } catch (err) {
-      console.error("Error al crear la novedad:", err);
-      setError("No se pudo crear la novedad.");
-      return null;
+    } catch (err: unknown) {
+      console.error("[useNews] Error al crear la novedad:", err);
+      const msg =
+        err instanceof Error ? err.message : "No se pudo crear la novedad.";
+      setError(msg);
+      throw err; // Re-lanzamos para que el formulario lo atrape y muestre la alerta exacta
     }
   };
 
-  const updatePost = async (id: string | number, patch: UpdatePostInput) => {
+  const updatePost = async (id: string | number, patch: UpdatePostInput): Promise<Post> => {
     try {
       const updatedPost = await newsService.update(id, patch);
-      if (!updatedPost) return null;
+      if (!updatedPost) {
+        throw new Error("No se pudo actualizar la publicación en el servidor.");
+      }
 
-      await loadPosts(mode);
+      try {
+        await loadPosts(mode);
+      } catch {
+        // Ignoramos fallo de recarga
+      }
 
       return updatedPost;
-    } catch (err) {
-      console.error("Error al actualizar la novedad:", err);
-      setError("No se pudo actualizar la novedad.");
-      return null;
+    } catch (err: unknown) {
+      console.error("[useNews] Error al actualizar la novedad:", err);
+      const msg =
+        err instanceof Error ? err.message : "No se pudo actualizar la novedad.";
+      setError(msg);
+      throw err;
     }
   };
 
-  const updatePostState = async (id: string | number, postStateId: number) => {
+  const updatePostState = async (id: string | number, postStateId: number): Promise<Post | null> => {
     try {
       const updatedPost = await newsService.updateState(id, postStateId);
       if (!updatedPost) return null;
 
-      await loadPosts(mode);
+      try {
+        await loadPosts(mode);
+      } catch {
+        // Ignoramos fallo de recarga
+      }
 
       return updatedPost;
-    } catch (err) {
-      console.error("Error al cambiar el estado de la novedad:", err);
-      setError("No se pudo cambiar el estado de la novedad.");
-      return null;
+    } catch (err: unknown) {
+      console.error("[useNews] Error al cambiar el estado de la novedad:", err);
+      const msg =
+        err instanceof Error ? err.message : "No se pudo cambiar el estado de la novedad.";
+      setError(msg);
+      throw err;
     }
   };
 
-  const deletePost = async (id: string | number) => {
+  const deletePost = async (id: string | number): Promise<boolean> => {
     try {
       const success = await newsService.delete(id);
       if (!success) return false;
 
-      await loadPosts(mode);
+      try {
+        await loadPosts(mode);
+      } catch {
+        // Ignoramos fallo de recarga
+      }
 
       return true;
-    } catch (err) {
-      console.error("Error al eliminar la novedad:", err);
-      setError("No se pudo eliminar la novedad.");
-      return false;
+    } catch (err: unknown) {
+      console.error("[useNews] Error al eliminar la novedad:", err);
+      const msg =
+        err instanceof Error ? err.message : "No se pudo eliminar la novedad.";
+      setError(msg);
+      throw err;
     }
   };
 
@@ -97,16 +127,16 @@ export const useNews = (mode: NewsMode = "published") => {
     try {
       return await newsService.getById(id);
     } catch (err) {
-      console.error("Error al obtener la novedad por ID:", err);
+      console.error("[useNews] Error al obtener la novedad por ID:", err);
       return null;
     }
   };
   
-  const incrementViews = async (id: string | number) => {
+  const incrementViews = async (id?: string | number) => {
     try {
       return await newsService.incrementViews(id);
     } catch (err) {
-      console.error("Error al incrementar la vista de la novedad:", err);
+      console.error("[useNews] Error al incrementar la vista de la novedad:", err);
       return null;
     }
   };
