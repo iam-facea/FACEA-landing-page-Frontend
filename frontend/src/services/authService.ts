@@ -30,10 +30,18 @@ export const authService = {
   },
 
   /**
-   * Cierra la sesión en Supabase y limpia el estado local.
+   * Cierra la sesión en Supabase y limpia el estado local de forma síncrona/inmediata.
    */
   logout: async (): Promise<void> => {
     try {
+      // 1. Limpiamos cualquier rastro de tokens de Supabase en localStorage de inmediato
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith("sb-") || key === "isAuthenticated")) {
+          localStorage.removeItem(key);
+        }
+      }
+      // 2. Avisamos al servidor de Supabase
       await supabase.auth.signOut();
     } catch (err) {
       console.error("[authService] Error al cerrar sesión en Supabase:", err);

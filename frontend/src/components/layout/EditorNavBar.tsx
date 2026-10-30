@@ -1,13 +1,20 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import faceaLogo from "../../assets/images/FACEA-logo.png";
 import { authService } from "../../services/authService";
 
 export const EditorNavBar = () => {
   const navigate = useNavigate();
+  const [loggingOut, setLoggingOut] = useState(false);
 
-  const handleLogout = () => {
-    authService.logout();
-    navigate("/login");
+  const handleLogout = async () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+      await authService.logout();
+    } finally {
+      navigate("/login", { replace: true });
+    }
   };
 
   return (
@@ -22,9 +29,10 @@ export const EditorNavBar = () => {
       <button
         type="button"
         onClick={handleLogout}
-        className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-[#0d153b] transition-colors hover:border-[#bd222f] hover:text-[#bd222f]"
+        disabled={loggingOut}
+        className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-[#0d153b] transition-colors hover:border-[#bd222f] hover:text-[#bd222f] disabled:cursor-not-allowed disabled:opacity-50"
       >
-        Cerrar sesión
+        {loggingOut ? "Cerrando..." : "Cerrar sesión"}
       </button>
     </header>
   );
