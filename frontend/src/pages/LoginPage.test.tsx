@@ -94,7 +94,7 @@ describe("Flujo de Login en LoginPage (Supabase Auth)", () => {
       "wrong_pass",
     );
     const alertMessage = await screen.findByRole("alert");
-    expect(alertMessage).not.toHaveTextContent(/credenciales inválidas/i);
+    expect(alertMessage).toHaveTextContent(/credenciales inválidas/i);
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
