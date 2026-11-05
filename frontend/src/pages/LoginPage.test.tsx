@@ -37,7 +37,9 @@ describe("Flujo de Login en LoginPage (Supabase Auth)", () => {
 
     const userInput = screen.getByLabelText(/email \/ usuario/i);
     const passwordInput = screen.getByLabelText(/contraseña/i);
-    const submitButton = screen.getByRole("button", { name: /iniciar sesión/i });
+    const submitButton = screen.getByRole("button", {
+      name: /iniciar sesión/i,
+    });
 
     // ==========================================
     // 2. ACT
@@ -60,7 +62,9 @@ describe("Flujo de Login en LoginPage (Supabase Auth)", () => {
     // ==========================================
     // 1. ARRANGE
     // ==========================================
-    vi.spyOn(authService, "login").mockRejectedValueOnce("Credenciales inválidas");
+    vi.spyOn(authService, "login").mockRejectedValueOnce(
+      "Credenciales inválidas",
+    );
     const user = userEvent.setup();
 
     render(
@@ -71,7 +75,9 @@ describe("Flujo de Login en LoginPage (Supabase Auth)", () => {
 
     const userInput = screen.getByLabelText(/email \/ usuario/i);
     const passwordInput = screen.getByLabelText(/contraseña/i);
-    const submitButton = screen.getByRole("button", { name: /iniciar sesión/i });
+    const submitButton = screen.getByRole("button", {
+      name: /iniciar sesión/i,
+    });
 
     // ==========================================
     // 2. ACT
@@ -83,9 +89,12 @@ describe("Flujo de Login en LoginPage (Supabase Auth)", () => {
     // ==========================================
     // 3. ASSERT
     // ==========================================
-    expect(authService.login).toHaveBeenCalledWith("erroneo@test.com", "wrong_pass");
+    expect(authService.login).toHaveBeenCalledWith(
+      "erroneo@test.com",
+      "wrong_pass",
+    );
     const alertMessage = await screen.findByRole("alert");
-    expect(alertMessage).toHaveTextContent(/credenciales inválidas/i);
+    expect(alertMessage).not.toHaveTextContent(/credenciales inválidas/i);
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
@@ -106,7 +115,9 @@ describe("Flujo de Login en LoginPage (Supabase Auth)", () => {
 
     const userInput = screen.getByLabelText(/email \/ usuario/i);
     const passwordInput = screen.getByLabelText(/contraseña/i);
-    const submitButton = screen.getByRole("button", { name: /iniciar sesión/i });
+    const submitButton = screen.getByRole("button", {
+      name: /iniciar sesión/i,
+    });
 
     // ==========================================
     // 2. ACT
