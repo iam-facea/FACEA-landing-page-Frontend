@@ -26,6 +26,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# Vitest coverage
+coverage/
+
 # Playwright artifacts
 test-results/
 playwright-report/
