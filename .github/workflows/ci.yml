@@ -1,0 +1,121 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+  workflow_call:
+    inputs:
+      ref:
+        description: Immutable commit SHA (must equal the caller commit)
+        required: true
+        type: string
+    secrets:
+      SONAR_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CI: 'true'
+      VITE_SUPABASE_URL: https://facea-ci.supabase.co
+      VITE_SUPABASE_ANON_KEY: facea-ci-public-anon-key-not-a-secret
+    steps:
+      - name: Validate reusable commit
+        if: ${{ inputs.ref != '' }}
+        env:
+          REQUESTED_REF: ${{ inputs.ref }}
+        run: |
+          [[ "$REQUESTED_REF" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$REQUESTED_REF" == "$GITHUB_SHA" ]]
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: |
+            frontend/package-lock.json
+            e2e-tests/package-lock.json
+      - name: Pin npm
+        run: npm install --global npm@11.18.0
+      - name: Install locked dependencies
+        run: |
+          npm ci --prefix frontend
+          npm ci --prefix e2e-tests
+      - name: Lint
+        run: npm run lint --prefix frontend
+      - name: Unit tests with coverage
+        run: |
+          npm run test:coverage --prefix frontend
+          test -s frontend/coverage/lcov.info
+      - name: Build
+        run: npm run build --prefix frontend
+      # Each suite owns its Playwright lock and potentially a different browser revision.
+      - name: Install internal Chromium
+        working-directory: frontend
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Install external Chromium
+        working-directory: e2e-tests
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Internal E2E (2 cases)
+        working-directory: frontend
+        run: npm run test:e2e -- --retries=0
+      - name: External E2E against built preview (3 cases)
+        shell: bash
+        run: |
+          node frontend/node_modules/vite/bin/vite.js preview frontend --host 127.0.0.1 --port 5187 --strictPort &
+          preview_pid=$!
+          trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
+          ready=false
+          for attempt in {1..60}; do
+            if curl --fail --silent http://127.0.0.1:5187/ > /dev/null; then
+              ready=true
+              break
+            fi
+            kill -0 "$preview_pid"
+            sleep 1
+          done
+          [[ "$ready" == true ]]
+          cd e2e-tests
+          BASE_URL=http://127.0.0.1:5187 npm test -- --retries=0
+      - name: Release and deploy helper tests (offline)
+        run: node --test scripts/*.test.mjs
+      - name: Sonar analysis and awaited Quality Gate
+        env:
+          # No token is supplied to fork PR code; missing analysis fails this check.
+          SONAR_TOKEN: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && secrets.SONAR_TOKEN || '' }}
+          SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY }}
+          SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
+          SONAR_HOST_URL: https://sonarcloud.io
+        run: |
+          : "${SONAR_TOKEN:?Sonar token unavailable; analysis is required}"
+          : "${SONAR_PROJECT_KEY:?Set SONAR_PROJECT_KEY}"
+          : "${SONAR_ORGANIZATION:?Set SONAR_ORGANIZATION}"
+          npm run sonar --prefix frontend -- \
+            "-Dsonar.projectKey=$SONAR_PROJECT_KEY" \
+            "-Dsonar.organization=$SONAR_ORGANIZATION" \
+            "-Dsonar.scm.revision=$GITHUB_SHA"
+      - name: Upload available test reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-reports-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: warn
+          retention-days: 7
+          path: |
+            frontend/coverage/
+            frontend/playwright-report/
+            frontend/test-results/
+            e2e-tests/playwright-report/
+            e2e-tests/test-results/
