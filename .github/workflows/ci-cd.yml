@@ -1,0 +1,193 @@
+name: CI/CD
+
+# PR hacia main: solo controles. Push a main (incluido merge): controles y publicación.
+# La versión PATCH se calcula automáticamente después de aprobar los controles.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Permiso mínimo por defecto: leer el repositorio; publicar requiere otro permiso abajo.
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    # Máquina temporal de GitHub; el job se cancela si supera 20 minutos.
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Valores públicos ficticios para pruebas/build, no credenciales de Supabase real.
+    # No usarlos como configuración del sitio productivo en Render.
+    env:
+      VITE_SUPABASE_URL: https://example.supabase.co
+      VITE_SUPABASE_ANON_KEY: ci-public-placeholder
+    steps:
+      # Descargar el SHA inmutable del evento, con historial para el análisis de Sonar.
+      # En PR, github.sha suele ser el merge sintético, no el commit de la rama origen.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      # Node según .nvmrc; cachear descargas npm usando el lockfile, no node_modules.
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Instalar y probar frontend
+        working-directory: frontend
+        run: |
+          # Fijar npm solo en este runner temporal, sin cambiar las dependencias del proyecto.
+          npm install --global npm@11.18.0
+          # Instalar exactamente lo resuelto en package-lock.json.
+          npm ci
+          # Buscar problemas de código con ESLint.
+          npm run lint
+          # Ejecutar Vitest y generar cobertura (incluido LCOV para Sonar).
+          npm run test:coverage
+          # Comprobar TypeScript y generar el frontend con Vite.
+          npm run build
+          # Instalar Chromium y sus bibliotecas de sistema para las pruebas de navegador.
+          npx playwright install --with-deps chromium
+          # E2E internos de frontend/e2e contra Vite local, sin reintentos y con salida textual.
+          # No ejecuta la suite externa de e2e-tests.
+          npm run test:e2e -- --retries=0 --reporter=list
+      # Scanner npm integrado en el proyecto, no una acción/plugin de Sonar.
+      # sonar-project.properties define fuentes, LCOV y espera del Quality Gate (hasta 300 s).
+      - name: SonarQube Cloud y Quality Gate
+        # Token secreto; proyecto/organización son variables de configuración, no secretos.
+        # Los PR de forks no reciben el token: no se omite el análisis como si hubiera pasado.
+        env:
+          SONAR_TOKEN: ${{ github.event.pull_request.head.repo.fork != true && secrets.SONAR_TOKEN || '' }}
+          SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY }}
+          SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
+          SONAR_HOST_URL: https://sonarcloud.io
+        run: |
+          # Si falta configuración o token (incluidos forks), fallar explícitamente.
+          # El scanner analiza este SHA y debe aprobar el Quality Gate para continuar.
+          [[ -n "$SONAR_TOKEN" && -n "$SONAR_PROJECT_KEY" && -n "$SONAR_ORGANIZATION" ]] || { echo 'Falta configuración Sonar (forks sin token).' >&2; exit 1; }
+          npm run sonar --prefix frontend -- -Dsonar.projectKey="$SONAR_PROJECT_KEY" -Dsonar.organization="$SONAR_ORGANIZATION" -Dsonar.scm.revision="$GITHUB_SHA"
+      # Intentar guardar los informes disponibles aunque falle un paso anterior, por 7 días.
+      # Si no llegaron a generarse, no añadir otro error por archivos ausentes.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: informes
+          path: |
+            frontend/coverage/
+            frontend/test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # Solo un push a main con checks exitosos puede publicar; los PR no llegan aquí.
+  release-deploy:
+    needs: checks
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Otro runner temporal, con su propio límite de 20 minutos.
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Revisores/aprobaciones de production se configuran fuera del YAML en GitHub.
+    environment: production
+    # Solo este job puede crear tags/releases con el token automático de GitHub.
+    permissions:
+      contents: write
+    # Serializar este grupo de publicación; no cancelar la ejecución que ya está en curso.
+    concurrency:
+      group: production-release
+      cancel-in-progress: false
+    # GH_TOKEN es automático y distinto de SONAR_TOKEN y del secreto RENDER_API_KEY.
+    # El identificador del servicio y la URL pública de Render son variables, no tokens.
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      RENDER_SERVICE_ID: ${{ vars.RENDER_SERVICE_ID }}
+      RENDER_SITE_URL: ${{ vars.RENDER_SITE_URL }}
+    steps:
+      # Usar el mismo SHA comprobado; no volver a resolver main si recibió nuevos commits.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Actualizar tags
+        run: |
+          # Checkout ya trajo el historial completo; refrescar todos los tags dentro del job serializado.
+          git fetch --tags origin
+      - name: Calcular próxima versión PATCH
+        run: |
+          set -euo pipefail
+          # Solo tags estables vX.Y.Z sin ceros iniciales; comparar números, no texto.
+          # BigInt evita pérdida de precisión; no se modifica package.json ni se crean tags aquí.
+          node <<'NODE'
+          const { execFileSync } = require('node:child_process');
+          const { appendFileSync } = require('node:fs');
+          const tags = execFileSync('git', ['tag', '--list'], { encoding: 'utf8' }).split('\n');
+          let highest;
+          for (const tag of tags) {
+            const match = /^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/.exec(tag);
+            if (!match) continue;
+            const version = match.slice(1).map(BigInt);
+            const different = highest ? version.findIndex((part, index) => part !== highest[index]) : -1;
+            if (!highest || (different !== -1 && version[different] > highest[different])) highest = version;
+          }
+          const next = highest ? `${highest[0]}.${highest[1]}.${highest[2] + 1n}` : '1.0.0';
+          appendFileSync(process.env.GITHUB_ENV, `VERSION=${next}\n`);
+          NODE
+      - name: Validar configuración y publicar versión
+        run: |
+          # Bash estricto: parar ante errores, variables no definidas o fallos en pipelines.
+          set -euo pipefail
+          # Validar rama/repositorio, SHA/token, versión y configuración Render antes de publicar.
+          [[ "$GITHUB_REF" == refs/heads/main && "$GITHUB_REPOSITORY" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]] || { echo 'Repositorio/rama inválidos.' >&2; exit 1; }
+          [[ "$GITHUB_SHA" =~ ^[0-9a-f]{40}$ && -n "$GH_TOKEN" ]] || { echo 'Falta SHA/token GitHub válido.' >&2; exit 1; }
+          [[ "$VERSION" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]] || { echo 'Versión inválida.' >&2; exit 1; }
+          [[ -n "$RENDER_API_KEY" && "$RENDER_SERVICE_ID" =~ ^srv-[A-Za-z0-9]+$ ]] || { echo 'Falta configuración Render.' >&2; exit 1; }
+          [[ "$RENDER_SITE_URL" =~ ^https://[A-Za-z0-9]([A-Za-z0-9.-]*[A-Za-z0-9])?$ ]] || { echo 'URL Render inválida: usar origen HTTPS sin ruta.' >&2; exit 1; }
+          # Consultar tags con gh sin tratar errores de permisos/red como ausencia de tag.
+          # matching-refs puede traer prefijos: jq comprueba la referencia EXACTA vVERSION.
+          tags=$(gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/v$VERSION" 2>/dev/null) || { echo 'No se pudo consultar tags.' >&2; exit 1; }
+          jq -e --arg tag "refs/tags/v$VERSION" 'all(.[]; .ref != $tag)' <<< "$tags" >/dev/null || { echo 'El tag ya existe o la respuesta es inválida.' >&2; exit 1; }
+          # Crear la referencia de forma atómica: GitHub rechaza una colisión concurrente.
+          gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/v$VERSION" -f "sha=$GITHUB_SHA" >/dev/null 2>&1 || { echo 'No se pudo crear tag (posible colisión).' >&2; exit 1; }
+          # Publicar la GitHub Release sobre el tag verificado, asociado al SHA comprobado.
+          # Release y deploy NO son atómicos: un fallo posterior no revierte tag/release.
+          gh release create "v$VERSION" --repo "$GITHUB_REPOSITORY" --verify-tag --title "v$VERSION" --notes "Commit: $GITHUB_SHA" >/dev/null 2>&1 || { echo 'Falló la release; inspeccionar el tag creado.' >&2; exit 1; }
+      - name: Desplegar commit en Render y comprobar HTTP
+        run: |
+          # Mismo modo estricto; ningún fallo de API o de validación debe parecer éxito.
+          set -euo pipefail
+          # jq construye JSON seguro con commitId; curl solicita ese commit, no el último de main.
+          api="https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys"
+          payload=$(jq -n --arg sha "$GITHUB_SHA" '{commitId: $sha}')
+          response=$(curl --fail --silent --show-error --max-time 15 -X POST "$api" -H "Authorization: Bearer $RENDER_API_KEY" -H 'Content-Type: application/json' --data "$payload") || { echo 'Falló la solicitud Render.' >&2; exit 1; }
+          # Exigir ID de despliegue válido y SHA exacto en la respuesta antes de esperar.
+          deploy=$(jq -er '.id' <<< "$response")
+          [[ "$deploy" =~ ^dep-[A-Za-z0-9]+$ ]] || { echo 'ID de deploy inválido.' >&2; exit 1; }
+          [[ $(jq -er '.commit.id' <<< "$response") == "$GITHUB_SHA" ]] || { echo 'Commit Render incorrecto.' >&2; exit 1; }
+          # Consultar solo este ID/SHA, hasta 60 intentos (pausas de 5 s; cada curl tiene límite).
+          # Solo live permite seguir; estado fallido/desconocido o espera agotada => error.
+          live=false
+          for ((attempt=1; attempt<=60; attempt++)); do
+            response=$(curl --fail --silent --show-error --max-time 15 "$api/$deploy" -H "Authorization: Bearer $RENDER_API_KEY") || { echo 'Falló la consulta Render.' >&2; exit 1; }
+            [[ $(jq -er '.id' <<< "$response") == "$deploy" && $(jq -er '.commit.id' <<< "$response") == "$GITHUB_SHA" ]] || { echo 'Identidad/commit Render incorrectos.' >&2; exit 1; }
+            status=$(jq -er '.status' <<< "$response")
+            case "$status" in
+              live) live=true; break ;;
+              build_failed|update_failed|pre_deploy_failed|canceled|deactivated) echo 'Render terminó sin éxito.' >&2; exit 1 ;;
+              created|queued|build_in_progress|pre_deploy_in_progress|update_in_progress) sleep 5 ;;
+              *) echo 'Estado Render desconocido.' >&2; exit 1 ;;
+            esac
+          done
+          [[ "$live" == true ]] || { echo 'Timeout esperando Render live.' >&2; exit 1; }
+          # Smoke público de / y /login: sin autenticación ni redirects, exigir HTTP 200.
+          # No hay rollback automático: si falla deploy/smoke, inspeccionar y actuar manualmente.
+          for path in / /login; do
+            code=$(curl --fail --silent --show-error --max-time 15 --output /dev/null --write-out '%{http_code}' "$RENDER_SITE_URL$path") || { echo 'Falló smoke HTTP.' >&2; exit 1; }
+            [[ "$code" == 200 ]] || { echo 'Smoke requiere HTTP 200.' >&2; exit 1; }
+          done
+          echo 'Deploy live y smoke HTTP correctos.'
