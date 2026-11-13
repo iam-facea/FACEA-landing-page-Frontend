@@ -20,8 +20,11 @@ Apply the institutional review text changes (Misión, Escuela Sabática, Grupos 
 - Unrelated uncommitted `.gitignore` change (`.atl/`) stays untouched and uncommitted.
 
 ## Delivery
-- Branch: `chore/institutional-text-updates` (from up-to-date `develop`).
-- Routing: inline direct — single source file, exact replacement strings, no design decisions (below all delegation triggers).
+- Strategy: `ask-on-risk`.
+- Branch: `chore/institutional-text-updates` (from up-to-date `develop`), pushed to origin.
+- Issue: iam-facea/FACEA-landing-page-Frontend#35 (`status:approved`, `enhancement`, Spanish per repo convention, duplicate search completed).
+- Pull request: iam-facea/FACEA-landing-page-Frontend#36 → `develop`, labeled `type:feature`, body links `Closes #35`.
+- Production rollout (develop → main) remains an explicit operator decision after PR approval.
 
 ## Test mode
 - Ordinary checks: `npm run lint` and `npm run build` from `frontend/`.
