@@ -63,7 +63,7 @@ Phase 1 complete (texts, «Eventos Sociales» rename, two card photographs). Pha
 - Image commit: `7b9910d8d99c2dec1d51a47b299f5658bb04c1fb` (`feat(landing): replace grupos faros and eventos sociales card images`).
 - Team card work unit: `npm run lint` passed; `npm run build` passed; diff is exactly one import line, the section comment, alt text, `src`, card title, and description; `Nuestro equipo.jpeg` (178 KB) copied without duplication.
 - Team card commit: `0ea6cdeda9951fdda379628129f4ab79e4dbf340` (`feat(landing): rename departamentos card to nuestro equipo`).
-- Team photo swap: md5 `18d5be576155e89271ff845681ef42d5` matches the source file exactly; `npm run lint` and `npm run build` passed; work-unit commit: (recorded after commit)
+- Team photo swap: md5 `18d5be576155e89271ff845681ef42d5` matches the source file exactly; `npm run lint` and `npm run build` passed; work-unit commit: `b6c978cbb7a7ec56eb7d04bca67f53440cb025c5` (`feat(landing): swap nuestro equipo card photograph`)
 
 ## Next step
 Complete Phase 2 work unit, then run the native review preflight for the new candidate. Optional follow-up (out of scope): compress large card photographs and prune unreferenced legacy assets.
