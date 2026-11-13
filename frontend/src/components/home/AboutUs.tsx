@@ -3,16 +3,16 @@ import { Container } from "../ui/Container";
 
 // Importa aquí tus imágenes (asegúrate de que las rutas sean correctas)
 import gruposMisioneros from "../../assets/images/ESCUEL SABATICA.jpg.jpeg";
-import comisionFaros from "../../assets/images/Comision Faros.jpg"; // Ajusta el nombre
-import grupoOracion from "../../assets/images/Grupo-oracion.jpeg"; // Ajusta el nombre
-import musicaImage from "../../assets/images/Musica.jpg"; // Ajusta el nombre
+import comisionFaros from "../../assets/images/IMG_1225.jpg"; // Grupos Faros
+import eventosSocialesImage from "../../assets/images/IMG-20260323-WA0063.jpg"; // Eventos Sociales
+import nuestroEquipoImage from "../../assets/images/Nuestro equipo.jpeg"; // Nuestro equipo
 
 const valores = [
   {
     id: "origen",
     titulo: "Misión",
     texto:
-      "Acercar a los jóvenes a Dios mediante el estudio de la Biblia, las actividades y el compañerismo, fortaleciendo su fe y sentido de pertenencia.",
+      "Acercar a los jóvenes a Dios mediante el estudio de la Biblia, actividades diversas y el compañerismo, fortaleciendo su fe y sentido de pertenencia.",
   },
   {
     id: "valores",
@@ -81,8 +81,8 @@ export const AboutUs = () => {
                   Escuela Sabática
                 </h3>
                 <p className="max-w-md text-sm text-white/90 sm:text-base sm:text-white/80">
-                  Estudio profundo de las escrituras cada sábado por la mañana
-                  en un ambiente participativo.
+                  Estudio profundo y aplicado de las Escrituras cada
+                  sábado por la mañana, en un ambiente ameno y participativo.
                 </p>
               </div>
             </article>
@@ -100,47 +100,50 @@ export const AboutUs = () => {
                   Grupos Faros
                 </h3>
                 <p className="text-sm text-[#46464e]">
-                  Pequeñas comunidades de fe que se reúnen en hogares para
-                  compartir la vida y la Biblia.
+                  Pequeñas comunidades de fe que se reúnen en hogares,
+                  templos o lugares públicos para compartir la vida, la Biblia
+                  y actividades recreativas y didácticas.
                 </p>
               </div>
             </article>
 
-            {/* Grupos de Oración */}
+            {/* Eventos Sociales */}
             <article className="group relative min-h-[240px] overflow-hidden rounded-2xl bg-[#0d153b] md:col-span-4 md:row-span-1 shadow-sm">
               <img
-                alt="Grupos de Oración"
+                alt="Eventos Sociales"
                 className="absolute inset-0 h-full w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-105"
-                src={grupoOracion}
+                src={eventosSocialesImage}
                 loading="lazy"
               />
               <div className="relative z-20 flex h-full flex-col justify-end p-6 sm:p-8 md:p-10">
                 <h3 className="mb-2 text-2xl font-bold text-white">
-                  Grupos de Oración
+                  Eventos Sociales
                 </h3>
                 <p className="text-sm text-white/90 sm:text-white/80">
-                  Momentos dedicados a la intercesión y la conexión espiritual
-                  profunda.
+                  Compartimos diferentes actividades y encuentros para
+                  conocernos mejor, fortalecer nuestras amistades y disfrutar
+                  juntos de la vida universitaria.
                 </p>
               </div>
             </article>
 
-            {/* Departamentos */}
+            {/* Nuestro equipo */}
             <article className="group relative min-h-[240px] overflow-hidden rounded-2xl bg-white md:col-span-8 md:row-span-1 shadow-sm">
               <img
-                alt="Comunicación y Música"
+                alt="Nuestro equipo"
                 className="absolute inset-0 h-full w-full object-cover opacity-40 transition-transform duration-700 group-hover:scale-105"
-                src={musicaImage}
+                src={nuestroEquipoImage}
                 loading="lazy"
               />
               <div className="relative z-20 flex h-full flex-col justify-end p-6 sm:p-8 md:p-10">
                 <h3 className="mb-2 text-xl font-bold text-[#0d153b] sm:text-2xl sm:mb-3">
-                  Nuestros Departamentos
+                  Nuestro equipo
                 </h3>
                 <p className="text-sm leading-relaxed text-[#46464e] sm:text-base">
-                  Contamos con equipos de Comunicación y Música que enriquecen
-                  nuestras actividades y extienden nuestro mensaje con
-                  excelencia y creatividad.
+                  Contamos con un gran equipo de personas comprometidas que,
+                  con dedicación y trabajo en conjunto, apoyan las distintas
+                  actividades de nuestro grupo misionero y hacen posible llevar
+                  adelante nuestra misión.
                 </p>
               </div>
             </article>
