@@ -12,7 +12,7 @@ const valores = [
     id: "origen",
     titulo: "Misión",
     texto:
-      "Acercar a los jóvenes a Dios mediante el estudio de la Biblia, las actividades y el compañerismo, fortaleciendo su fe y sentido de pertenencia.",
+      "Acercar a los jóvenes a Dios mediante el estudio de la Biblia, actividades diversas y el compañerismo, fortaleciendo su fe y sentido de pertenencia.",
   },
   {
     id: "valores",
@@ -81,8 +81,8 @@ export const AboutUs = () => {
                   Escuela Sabática
                 </h3>
                 <p className="max-w-md text-sm text-white/90 sm:text-base sm:text-white/80">
-                  Estudio profundo de las escrituras cada sábado por la mañana
-                  en un ambiente participativo.
+                  Estudio profundo y aplicado de las Escrituras cada
+                  sábado por la mañana, en un ambiente ameno y participativo.
                 </p>
               </div>
             </article>
@@ -100,27 +100,29 @@ export const AboutUs = () => {
                   Grupos Faros
                 </h3>
                 <p className="text-sm text-[#46464e]">
-                  Pequeñas comunidades de fe que se reúnen en hogares para
-                  compartir la vida y la Biblia.
+                  Pequeñas comunidades de fe que se reúnen en hogares,
+                  templos o lugares públicos para compartir la vida, la Biblia
+                  y actividades recreativas y didácticas.
                 </p>
               </div>
             </article>
 
-            {/* Grupos de Oración */}
+            {/* Eventos Sociales */}
             <article className="group relative min-h-[240px] overflow-hidden rounded-2xl bg-[#0d153b] md:col-span-4 md:row-span-1 shadow-sm">
               <img
-                alt="Grupos de Oración"
+                alt="Eventos Sociales"
                 className="absolute inset-0 h-full w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-105"
                 src={grupoOracion}
                 loading="lazy"
               />
               <div className="relative z-20 flex h-full flex-col justify-end p-6 sm:p-8 md:p-10">
                 <h3 className="mb-2 text-2xl font-bold text-white">
-                  Grupos de Oración
+                  Eventos Sociales
                 </h3>
                 <p className="text-sm text-white/90 sm:text-white/80">
-                  Momentos dedicados a la intercesión y la conexión espiritual
-                  profunda.
+                  Compartimos diferentes actividades y encuentros para
+                  conocernos mejor, fortalecer nuestras amistades y disfrutar
+                  juntos de la vida universitaria.
                 </p>
               </div>
             </article>
