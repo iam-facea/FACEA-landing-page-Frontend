@@ -50,9 +50,15 @@ Apply the institutional review text changes (Misión, Escuela Sabática, Grupos 
   - Requested file `FOTO NUESTRO EQUIPO.jpeg` did not exist; the indicated folder holds exactly one team photo: `NUESTRO EQUIPO.jpeg` (158 KB). Treated as the unambiguous match and reported.
   - Windows case-insensitive collision: copying overwrote the existing `Nuestro equipo.jpeg` asset in place (md5-verified identical bytes); no code reference change required; prior photo remains in the user's multimedia folder.
 - [x] **VERIFY-03 — Lint, build, and readback of the image-only work unit**
+- [x] **SYNC-01 — Merge `origin/main` into `develop` before production release**
+  - Reason: PR #34 (`feat/cicd-workflows`) had landed on `main` only; a plain develop→main promotion would have deleted the CI/CD pipeline, Sonar config, vitest setup, and dependency updates from production.
+  - Merge commit `a2604f4` auto-merged clean; CI/CD files restored; institutional content intact (9 text markers verified).
+- [x] **SYNC-02 — Full health check on synchronized develop**
+  - `npm install` resynced node_modules to main's toolchain; `npm run lint`, `npm run build`, `npm run test` (vitest, 7/7) all passed.
+- [ ] **REL-01 — Pull request `develop` → `main` for production**
 
 ## Progress
-Phase 1 complete (texts, «Eventos Sociales» rename, two card photographs). Phase 2 complete («Nuestro equipo» rename + photograph). Phase 3 complete: team card photograph swapped in place. One review transaction (review-35bdf11d3a6603f7) was abandoned on explicit user decision after reviewer quota exhaustion (operator_disposition, audit record committed).
+Phases 1–3 complete (texts, card renames, photographs; PR #36 merged into develop). Release phase in progress: develop synchronized with main's CI/CD work, production promotion PR pending.
 
 ## Verification evidence
 - `npm run lint` passed; `npm run build` passed from `frontend/`.
