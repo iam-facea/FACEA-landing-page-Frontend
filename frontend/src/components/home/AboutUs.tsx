@@ -5,7 +5,7 @@ import { Container } from "../ui/Container";
 import gruposMisioneros from "../../assets/images/ESCUEL SABATICA.jpg.jpeg";
 import comisionFaros from "../../assets/images/IMG_1225.jpg"; // Grupos Faros
 import eventosSocialesImage from "../../assets/images/IMG-20260323-WA0063.jpg"; // Eventos Sociales
-import musicaImage from "../../assets/images/Musica.jpg"; // Ajusta el nombre
+import nuestroEquipoImage from "../../assets/images/Nuestro equipo.jpeg"; // Nuestro equipo
 
 const valores = [
   {
@@ -127,22 +127,23 @@ export const AboutUs = () => {
               </div>
             </article>
 
-            {/* Departamentos */}
+            {/* Nuestro equipo */}
             <article className="group relative min-h-[240px] overflow-hidden rounded-2xl bg-white md:col-span-8 md:row-span-1 shadow-sm">
               <img
-                alt="Comunicación y Música"
+                alt="Nuestro equipo"
                 className="absolute inset-0 h-full w-full object-cover opacity-40 transition-transform duration-700 group-hover:scale-105"
-                src={musicaImage}
+                src={nuestroEquipoImage}
                 loading="lazy"
               />
               <div className="relative z-20 flex h-full flex-col justify-end p-6 sm:p-8 md:p-10">
                 <h3 className="mb-2 text-xl font-bold text-[#0d153b] sm:text-2xl sm:mb-3">
-                  Nuestros Departamentos
+                  Nuestro equipo
                 </h3>
                 <p className="text-sm leading-relaxed text-[#46464e] sm:text-base">
-                  Contamos con equipos de Comunicación y Música que enriquecen
-                  nuestras actividades y extienden nuestro mensaje con
-                  excelencia y creatividad.
+                  Contamos con un gran equipo de personas comprometidas que,
+                  con dedicación y trabajo en conjunto, apoyan las distintas
+                  actividades de nuestro grupo misionero y hacen posible llevar
+                  adelante nuestra misión.
                 </p>
               </div>
             </article>

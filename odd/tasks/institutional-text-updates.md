@@ -40,9 +40,15 @@ Apply the institutional review text changes (Misión, Escuela Sabática, Grupos 
 - [x] **IMAGE-02 — Replace the «Grupos Faros» card photograph**
   - Source: `IMG_1225.jpg` from the same folder; copied into `frontend/src/assets/images/`; `comisionFaros` import repointed; title, description, and design unchanged.
 - [x] **VERIFY-01 — Lint, build, and structural readback of the committed text work unit**
+- [x] **DEPT-01 — Rename the «Nuestros Departamentos» card to «Nuestro equipo»**
+  - New title and description verbatim from the user; alt text and section comment follow the card identity.
+  - Acceptance: markup, classes, overlay, dimensions, and responsive behavior unchanged.
+- [x] **DEPT-02 — Replace the card photograph with `Nuestro equipo.jpeg`**
+  - Source: same institutional multimedia folder (real name `FOTOS FACEA IMPRIMIR`); copy into `frontend/src/assets/images/`; repoint the import/reference; no other image touched.
+- [x] **VERIFY-02 — Lint, build, and structural readback of the card work unit**
 
 ## Progress
-All tasks complete: three institutional texts, «Eventos Sociales» rename, and both card photographs replaced. Old assets `Comision Faros.jpg` and `Grupo-oracion.jpeg` remain in the assets folder unreferenced (removing them was out of scope).
+Phase 1 complete (texts, «Eventos Sociales» rename, two card photographs). Phase 2 complete: «Nuestros Departamentos» card → «Nuestro equipo» (title, description, photograph).
 
 ## Verification evidence
 - `npm run lint` passed; `npm run build` passed from `frontend/`.
@@ -51,6 +57,8 @@ All tasks complete: three institutional texts, «Eventos Sociales» rename, and 
 - Pre-existing local Supabase connection warnings in the dev log are unrelated to this change (dynamic news content; backend out of scope).
 - Commit: `4fa138538e2e03a4a023372638f5eef006328026` (`feat(landing): update institutional texts and rename card to social events`).
 - Image commit: `7b9910d8d99c2dec1d51a47b299f5658bb04c1fb` (`feat(landing): replace grupos faros and eventos sociales card images`).
+- Team card work unit: `npm run lint` passed; `npm run build` passed; diff is exactly one import line, the section comment, alt text, `src`, card title, and description; `Nuestro equipo.jpeg` (178 KB) copied without duplication.
+- Team card commit: (recorded after commit)
 
 ## Next step
-User visual confirmation at http://localhost:5173/; push or PR only on explicit request. Optional follow-up (out of scope): compress `IMG_1225.jpg` (3.4 MB) and prune unreferenced legacy assets.
+Complete Phase 2 work unit, then run the native review preflight for the new candidate. Optional follow-up (out of scope): compress large card photographs and prune unreferenced legacy assets.
