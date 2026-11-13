@@ -50,7 +50,7 @@ All tasks complete: three institutional texts, «Eventos Sociales» rename, and 
 - Image work-unit readback: diff is exactly two import lines plus one `src` reference; both new files copied without duplication; Vite HMR applied the update and the build bundles both images.
 - Pre-existing local Supabase connection warnings in the dev log are unrelated to this change (dynamic news content; backend out of scope).
 - Commit: `4fa138538e2e03a4a023372638f5eef006328026` (`feat(landing): update institutional texts and rename card to social events`).
-- Image commit: (recorded after commit)
+- Image commit: `7b9910d8d99c2dec1d51a47b299f5658bb04c1fb` (`feat(landing): replace grupos faros and eventos sociales card images`).
 
 ## Next step
 User visual confirmation at http://localhost:5173/; push or PR only on explicit request. Optional follow-up (out of scope): compress `IMG_1225.jpg` (3.4 MB) and prune unreferenced legacy assets.
