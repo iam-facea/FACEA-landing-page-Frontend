@@ -3,8 +3,8 @@ import { Container } from "../ui/Container";
 
 // Importa aquí tus imágenes (asegúrate de que las rutas sean correctas)
 import gruposMisioneros from "../../assets/images/ESCUEL SABATICA.jpg.jpeg";
-import comisionFaros from "../../assets/images/Comision Faros.jpg"; // Ajusta el nombre
-import grupoOracion from "../../assets/images/Grupo-oracion.jpeg"; // Ajusta el nombre
+import comisionFaros from "../../assets/images/IMG_1225.jpg"; // Grupos Faros
+import eventosSocialesImage from "../../assets/images/IMG-20260323-WA0063.jpg"; // Eventos Sociales
 import musicaImage from "../../assets/images/Musica.jpg"; // Ajusta el nombre
 
 const valores = [
@@ -112,7 +112,7 @@ export const AboutUs = () => {
               <img
                 alt="Eventos Sociales"
                 className="absolute inset-0 h-full w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-105"
-                src={grupoOracion}
+                src={eventosSocialesImage}
                 loading="lazy"
               />
               <div className="relative z-20 flex h-full flex-col justify-end p-6 sm:p-8 md:p-10">
