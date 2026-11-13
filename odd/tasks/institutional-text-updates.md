@@ -46,9 +46,13 @@ Apply the institutional review text changes (Misión, Escuela Sabática, Grupos 
 - [x] **DEPT-02 — Replace the card photograph with `Nuestro equipo.jpeg`**
   - Source: same institutional multimedia folder (real name `FOTOS FACEA IMPRIMIR`); copy into `frontend/src/assets/images/`; repoint the import/reference; no other image touched.
 - [x] **VERIFY-02 — Lint, build, and structural readback of the card work unit**
+- [x] **IMG-03 — Replace the «Nuestro equipo» photograph in place**
+  - Requested file `FOTO NUESTRO EQUIPO.jpeg` did not exist; the indicated folder holds exactly one team photo: `NUESTRO EQUIPO.jpeg` (158 KB). Treated as the unambiguous match and reported.
+  - Windows case-insensitive collision: copying overwrote the existing `Nuestro equipo.jpeg` asset in place (md5-verified identical bytes); no code reference change required; prior photo remains in the user's multimedia folder.
+- [x] **VERIFY-03 — Lint, build, and readback of the image-only work unit**
 
 ## Progress
-Phase 1 complete (texts, «Eventos Sociales» rename, two card photographs). Phase 2 complete: «Nuestros Departamentos» card → «Nuestro equipo» (title, description, photograph).
+Phase 1 complete (texts, «Eventos Sociales» rename, two card photographs). Phase 2 complete («Nuestro equipo» rename + photograph). Phase 3 complete: team card photograph swapped in place. One review transaction (review-35bdf11d3a6603f7) was abandoned on explicit user decision after reviewer quota exhaustion (operator_disposition, audit record committed).
 
 ## Verification evidence
 - `npm run lint` passed; `npm run build` passed from `frontend/`.
@@ -58,7 +62,8 @@ Phase 1 complete (texts, «Eventos Sociales» rename, two card photographs). Pha
 - Commit: `4fa138538e2e03a4a023372638f5eef006328026` (`feat(landing): update institutional texts and rename card to social events`).
 - Image commit: `7b9910d8d99c2dec1d51a47b299f5658bb04c1fb` (`feat(landing): replace grupos faros and eventos sociales card images`).
 - Team card work unit: `npm run lint` passed; `npm run build` passed; diff is exactly one import line, the section comment, alt text, `src`, card title, and description; `Nuestro equipo.jpeg` (178 KB) copied without duplication.
-- Team card commit: (recorded after commit)
+- Team card commit: `0ea6cdeda9951fdda379628129f4ab79e4dbf340` (`feat(landing): rename departamentos card to nuestro equipo`).
+- Team photo swap: md5 `18d5be576155e89271ff845681ef42d5` matches the source file exactly; `npm run lint` and `npm run build` passed; work-unit commit: (recorded after commit)
 
 ## Next step
 Complete Phase 2 work unit, then run the native review preflight for the new candidate. Optional follow-up (out of scope): compress large card photographs and prune unreferenced legacy assets.
